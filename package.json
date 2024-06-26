@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "axios": "^1.7.2",
+    "express": "^4.19.2",
+    "mysql": "^2.18.1",
+    "n": "^9.2.3",
+    "stable": "^0.1.8",
+    "vue": "^3.4.30",
+    "@vue/cli-service": "^5.0.0",
+    "vue-router": "^4.4.0",
+    "vuex": "^4.0.2"
+  },
+  "scripts": {
+    "build": "vue-cli-service build",
+    "serve": "vue-cli-service serve",
+    "start": "node server.js"
+  }
+}
