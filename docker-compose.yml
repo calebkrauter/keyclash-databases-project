@@ -1,0 +1,10 @@
+
+services:
+  vue-game:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      
+    container_name: vue-game-container
+    ports:
+      - "8080:8080"
