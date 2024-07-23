@@ -26,16 +26,8 @@
 
 The following file structure is commonly used in Vue.js projects for its clarity and organization:
 
-project-root
-├── index.html
-└── src
-├── components
-├── views
-├── router
-├── public
-├── styles
-├── App.vue
-└── main.js
+<img width="168" alt="image" src="https://github.com/user-attachments/assets/06f19795-391c-4f25-8244-4292bb816728">
+
 
 ### index.html (in project root)
 
