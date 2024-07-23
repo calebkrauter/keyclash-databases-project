@@ -26,14 +26,14 @@
 
 The following file structure is commonly used in Vue.js projects for its clarity and organization:
 
-project-root/
+project-root
 ├── index.html
-└── src/
-├── components/
-├── views/
-├── router/
-├── public/
-├── styles/
+└── src
+├── components
+├── views
+├── router
+├── public
+├── styles
 ├── App.vue
 └── main.js
 
