@@ -1,17 +1,14 @@
+<script>
+import Navbar from '@/components/Navbar.vue'
+import {RouterView} from 'vue-router';
+</script>
 <template>
-    <div id="app">
-      <!-- Your app content -->
-      <router-view></router-view>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'App',
-    // component logic here
-  }
-  </script>
-  
-  <style>
-  /* Your global styles here */
-  </style>
+  <Navbar />
+  <RouterView />
+</template>
+
+<style>
+html {
+  scroll-behavior: smooth;
+}
+</style>

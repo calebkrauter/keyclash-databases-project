@@ -1,9 +1,5 @@
 #!/bin/bash
+echo "Running Docker container"
 
-set -e
-
-IMAGE_NAME="vue-game"
-CONTAINER_NAME="vue-game-container"
-
-echo "Building Docker image..."
-docker build -t $IMAGE_NAME .
+docker-compose down
+docker-compose up
