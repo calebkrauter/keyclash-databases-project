@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Building Docker container"
+echo "Running Docker container"
 
 docker-compose down
 docker-compose up
