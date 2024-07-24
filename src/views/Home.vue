@@ -22,7 +22,7 @@
   
       <!-- Additional content for the about section can be added here -->
     </section>
-    <section id="about" class="about-us-section">
+    <section id="about-us" class="about-us-section">
       <span class = about-us-content>
         <h2 ref="popOutText" class="pop-out-text">Here we are!</h2>
       </span>
