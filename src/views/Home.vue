@@ -22,35 +22,40 @@
   
       <!-- Additional content for the about section can be added here -->
     </section>
+    <section id="about" class="about-us-section">
+      <span class = about-us-content>
+        <h2 ref="popOutText" class="pop-out-text">Here we are!</h2>
+      </span>
+  
+      <!-- Additional content for the about section can be added here -->
+    </section>
   </div>
 </template>
 
 <script>
+import { useRouter } from 'vue-router'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import Navbar from '@/components/Navbar.vue'
-
 export default {
   name: 'Home',
-  components: {
-    Navbar
-  },
   setup() {
     const popOutText = ref(null)
+    const router = useRouter()
 
     // Function to handle scroll event for pop-out text animation
     const handleScroll = () => {
-      if (!popOutText.value) return
+      const popOutTexts = document.querySelectorAll('.pop-out-text')
+      
+      popOutTexts.forEach((element) => {
+        const position = element.getBoundingClientRect().top
+        const screenPosition = window.innerHeight / 1.1
 
-      const position = popOutText.value.getBoundingClientRect().top
-      const screenPosition = window.innerHeight / 1.3
-
-      if (position < screenPosition) {
-        popOutText.value.classList.add('visible')
-      } else {
-        popOutText.value.classList.remove('visible')
-      }
+        if (position < screenPosition) {
+          element.classList.add('visible')
+        } else {
+          element.classList.remove('visible')
+        }
+      })
     }
-
     // Lifecycle hooks
     onMounted(() => {
       window.addEventListener('scroll', handleScroll)
@@ -59,16 +64,13 @@ export default {
     onBeforeUnmount(() => {
       window.removeEventListener('scroll', handleScroll)
     })
-
+    const startGame = () => {
+      router.push('/game')
+    }
     return {
       popOutText,
-      handleScroll
-    }
-  },
-  methods: {
-    startGame() {
-      console.log("Starting game")
-      // Add game start logic here
+      handleScroll,
+      startGame
     }
   }
 }
@@ -171,10 +173,20 @@ export default {
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  
 }
 
 /* About Section Styles */
 .about-section {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background-color: #f0f0f0;
+}
+.about-us-section {
   min-height: 100vh;
   display: flex;
   flex-direction: column;

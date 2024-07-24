@@ -5,8 +5,8 @@
         </div>
         <ul class="nav-links">
             <li><a href="/">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#about-us">About us</a></li>
+            <li><a href="/#about">About</a></li>
+            <li><a href="/#about-us">About us</a></li>
         </ul>
     </nav>
 </template>
