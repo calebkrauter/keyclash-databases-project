@@ -1,24 +1,31 @@
 <template>
-  <!-- Insert Navbar component at the top -->
+  <!-- Navigation component -->
   <Navbar />
-  <!-- Create the welcome text and play button -->
-  <div class="home">
-    <div class="initial-content">
-      <!-- The classes are set to stagger-animate as elements of the class will have an animation -->
-      <h1 class="stagger-animate" style="--i: 1">Welcome to KeyClash</h1>
-      <p class="stagger-animate" style="--i: 2">Discover the ultimate typing challenge!</p>
-      <button @click="startGame" class="stagger-animate" style="--i: 3">Play Game</button>
-    </div>
 
-    <div class="scroll-section">
-      <h2 ref="popOutText" class="pop-out-text">What is KeyClash</h2>
-    </div>
+  <div class="home">
+    <!-- Welcome Section -->
+    <section class="welcome-section">
+      <div class="initial-content">
+        <h1 class="typing-animation">Welcome to KeyClash</h1>
+        <p class="typing-animation">
+          <span class="hidden">Discover the ultimate typing challenge!</span>
+        </p>
+        <button @click="startGame" class="fade-in">Play Game</button>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+      <span class = about-content>
+        <h2 ref="popOutText" class="pop-out-text">What is KeyClash</h2>
+      </span>
+  
+      <!-- Additional content for the about section can be added here -->
+    </section>
   </div>
 </template>
 
 <script>
-//ref, onMounted, onBeforeUnmount are important to vue as it allows for code to be executed at different times of the instance.
-//https://vuejs.org/guide/essentials/lifecycle.html
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import Navbar from '@/components/Navbar.vue'
 
@@ -30,23 +37,21 @@ export default {
   setup() {
     const popOutText = ref(null)
 
+    // Function to handle scroll event for pop-out text animation
     const handleScroll = () => {
       if (!popOutText.value) return
 
       const position = popOutText.value.getBoundingClientRect().top
       const screenPosition = window.innerHeight / 1.3
 
-      console.log('Position:', position, 'Screen Position:', screenPosition)
-
       if (position < screenPosition) {
-        console.log('Adding visible class')
         popOutText.value.classList.add('visible')
       } else {
-        console.log('Removing visible class')
         popOutText.value.classList.remove('visible')
       }
     }
 
+    // Lifecycle hooks
     onMounted(() => {
       window.addEventListener('scroll', handleScroll)
     })
@@ -62,97 +67,184 @@ export default {
   },
   methods: {
     startGame() {
-      console.log("starting game")
+      console.log("Starting game")
+      // Add game start logic here
     }
   }
 }
 </script>
 
 <style scoped>
+/* Keyframe Animations */
+@keyframes gradientShift {
+
+0%,
+100% {
+  background-position: 0% 0%;
+}
+
+10% {
+  background-position: 100% 0%;
+}
+
+20% {
+  background-position: 200% 100%;
+}
+
+30% {
+  background-position: 300% 200%;
+}
+
+40% {
+  background-position: 400% 300%;
+}
+
+50% {
+  background-position: 500% 400%;
+}
+
+60% {
+  background-position: 400% 500%;
+}
+
+70% {
+  background-position: 300% 600%;
+}
+
+80% {
+  background-position: 200% 700%;
+}
+
+90% {
+  background-position: 100% 800%;
+}
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+@keyframes fadeIn {
+  to { opacity: 1 }
+}
+
+@keyframes reveal {
+  0%, 99% {
+    visibility: hidden;
+    opacity: 0;
+  }
+  100% {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+/* General Styles */
 .home {
   text-align: center;
-  padding: 2rem;
 }
+
+/* Welcome Section Styles */
+.welcome-section {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(45deg,
+    #FFC3A8, #F57E9A, #EB3E8C, #D61F77, #B70159,
+    #8E44AD, #3498DB, #2ECC71, #F1C40F, #E67E22, #FFC3A8);
+  background-size: 1000% 1000%;
+  animation: 
+    fadeIn 1s ease-in-out forwards,
+    gradientShift 120s ease-in-out infinite;
+}
+
 .initial-content {
   height: 50vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 }
 
-.scroll-section {
-  height: 50vh;
+/* About Section Styles */
+.about-section {
+  min-height: 100vh;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  padding: 0 20px;
-}
-@keyframes exaggeratedFadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(100px) scale(0.5);
-  }
-
-  60% {
-    transform: translateY(-20px) scale(1.1);
-  }
-
-  80% {
-    transform: translateY(10px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  align-items: center;
+  padding: 2rem;
+  background-color: #f0f0f0;
 }
 
-.stagger-animate {
-  opacity: 0;
-  animation: exaggeratedFadeInUp 1.2s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
-  animation-delay: calc(var(--i) * 0.3s);
+/* Typography Styles */
+h1, p {
+  color: white;
+  max-width: 100%;
 }
 
 h1 {
-  font-size: 2.5rem;
-  color: #333;
-  margin-bottom: 1rem;
+  font-size: 2rem;
+  padding: 1.5rem;
 }
 
 p {
-  font-size: 1.2rem;
-  color: #666;
-  margin-bottom: 2rem;
+  font-size: 1.5rem;
+  padding: 1.5rem;
 }
 
+/* Animation Classes */
+.typing-animation {
+  overflow: hidden;
+  white-space: nowrap;
+  margin: 0 auto;
+  animation: typing 2s steps(40, end);
+}
+
+p.typing-animation {
+  animation-delay: 2.5s;
+}
+
+.hidden {
+  visibility: hidden;
+  opacity: 0;
+  animation: reveal 0.1s linear forwards;
+  animation-delay: 2.5s;
+}
+.fade-in{
+  opacity: 0; /* Start fully transparent */
+  animation: fadeIn 1s ease-in-out forwards;
+  animation-delay: 5s;
+}
+
+/* Button Styles */
 button {
   background-color: #000000;
   border: none;
   color: white;
-  padding: 15px 32px;
+  padding: 1.5rem 2rem;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
+  font-size: 1rem;
+  margin: 0.5rem;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 0.25rem;
+  transition: background-color 0.3s ease;
 }
-
 
 button:hover {
-  background-color: #1b6e1f;
+  background-color: #6d1f4e;
 }
 
-.scroll-section {
-  height: 100vh;
-  /* This ensures the section is tall enough to scroll to */
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-}
-
+/* Pop-out Text Animation */
 .pop-out-text {
   transform: translateX(-100%);
   opacity: 0;
