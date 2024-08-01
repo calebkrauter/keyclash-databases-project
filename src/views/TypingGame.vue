@@ -57,24 +57,15 @@
         startTime.value = Date.now();
       }
       let keysPresseedIterator = 0;
-     
       let backspacePressed = false;
-      function checkInput() {
+
+      function checkInput() {  
         let userInputChar = userInput.value.split('');
-        let charsToType = currentText.value.split('')
-        console.log(keysPresseedIterator)
+        let charsToType = currentText.value.split('') 
+
           if (userInputChar[keysPresseedIterator] != undefined && (userInputChar[keysPresseedIterator] === charsToType[keysPresseedIterator])) {
-            console.log("User input " + userInputChar[keysPresseedIterator]);
-            console.log("TO  TYPE   " + charsToType[keysPresseedIterator])
-
             curCharTextColor = "green";
-            console.log(keysPresseedIterator)
-            console.log(userInputChar)
-            console.log(charsToType)
-
-            console.log(charsToType===userInputChar)
-
-            if (keysPresseedIterator === charsToType.length - 1){
+            if ((keysPresseedIterator === charsToType.length - 1) && (JSON.stringify(userInputChar) === JSON.stringify(charsToType))){
               endTime.value = Date.now();
               gameEnded.value = true;
               keysPresseedIterator = -1;
@@ -84,8 +75,6 @@
             } 
           } else {
             curCharTextColor = "red";
-            // console.log("User input " + userInputChar[keysPresseedIterator]);
-            // console.log("TO  TYPE   " + charsToType[keysPresseedIterator]);
           }
           if (!backspacePressed) {
             keysPresseedIterator++;
@@ -97,14 +86,12 @@
             keysPresseedIterator = 0;
           }
           if (pasted.value || pasteToWin.value) {
-            console.log("No cheating... No no no...")
             userInput.value = '';
             userInputChar = userInput.value.split('');
             keysPresseedIterator = -1;
             curCharTextColor = "red";
             pasted.value = false;
           }
-        
       }
       function handleKeydown(event) {
           if (event.key === "Backspace") {
@@ -118,7 +105,6 @@
           }
         }
       const inputTextStyle = computed(() => {
-        // console.log(userInput.value)
 
         return {
           color: userInput.value ? curCharTextColor : "black" ,
@@ -144,12 +130,6 @@
           this.gameStarted = false;
         }
       },
-
-      // userInput(text) {
-      //   userInputCharacters = text.split('')
-
-      // }
-      
     }
 
   }
