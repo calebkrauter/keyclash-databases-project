@@ -14,6 +14,7 @@
         />
         <p v-if="gameEnded">Game Over! Your WPM: {{ wpm }}</p>
         <button @click="startGame" v-if="!gameStarted" :class="{'play-btn': true}">Start Game</button>
+        <p v-if="pasteToWin">We don't allow PASTE TO WIN...</p>
       </div>
     </div>
   </template>
@@ -34,6 +35,8 @@
       const userInput = ref('');
       const gameStarted = ref(false);
       const gameEnded = ref(false);
+      const pasteToWin = ref(false);
+      const pasted= ref(false);
       const startTime = ref(0);
       const endTime = ref(0);
    
@@ -56,23 +59,29 @@
       let keysPresseedIterator = 0;
      
       let backspacePressed = false;
-
       function checkInput() {
         let userInputChar = userInput.value.split('');
         let charsToType = currentText.value.split('')
         console.log(keysPresseedIterator)
           if (userInputChar[keysPresseedIterator] != undefined && (userInputChar[keysPresseedIterator] === charsToType[keysPresseedIterator])) {
-            // console.log("User input " + userInputChar[keysPresseedIterator]);
-            // console.log("TO  TYPE   " + charsToType[keysPresseedIterator])
+            console.log("User input " + userInputChar[keysPresseedIterator]);
+            console.log("TO  TYPE   " + charsToType[keysPresseedIterator])
 
             curCharTextColor = "green";
             console.log(keysPresseedIterator)
+            console.log(userInputChar)
+            console.log(charsToType)
+
+            console.log(charsToType===userInputChar)
+
             if (keysPresseedIterator === charsToType.length - 1){
               endTime.value = Date.now();
               gameEnded.value = true;
               keysPresseedIterator = -1;
-
-            }
+              pasteToWin.value = false;
+            } else if (JSON.stringify(userInputChar) === JSON.stringify(charsToType)) {
+              pasteToWin.value = true;
+            } 
           } else {
             curCharTextColor = "red";
             // console.log("User input " + userInputChar[keysPresseedIterator]);
@@ -81,9 +90,20 @@
           if (!backspacePressed) {
             keysPresseedIterator++;
           } else {
+            keysPresseedIterator = userInputChar.length;
             backspacePressed = false;
           }
-
+          if (userInputChar.length <= 0) {
+            keysPresseedIterator = 0;
+          }
+          if (pasted.value || pasteToWin.value) {
+            console.log("No cheating... No no no...")
+            userInput.value = '';
+            userInputChar = userInput.value.split('');
+            keysPresseedIterator = -1;
+            curCharTextColor = "red";
+            pasted.value = false;
+          }
         
       }
       function handleKeydown(event) {
@@ -93,6 +113,8 @@
             if (keysPresseedIterator < -1) {
               keysPresseedIterator = 0;
             }
+          } else if (event.ctrlKey && event.key === "v") {
+            pasted.value = true;
           }
         }
       const inputTextStyle = computed(() => {
@@ -112,6 +134,7 @@
         startGame,
         checkInput,
         handleKeydown,
+        pasteToWin,
       };
 
     },
@@ -121,6 +144,7 @@
           this.gameStarted = false;
         }
       },
+
       // userInput(text) {
       //   userInputCharacters = text.split('')
 
