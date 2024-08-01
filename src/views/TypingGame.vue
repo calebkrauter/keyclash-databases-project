@@ -7,11 +7,13 @@
         <input
           v-model="userInput"
           @input="checkInput"
+          @keydown="handleKeydown"
           :disabled="!gameStarted || gameEnded"
           placeholder="Type here..."
+          :style="inputTextStyle"
         />
-        <button @click="startGame" v-if="!gameStarted">Start Game</button>
         <p v-if="gameEnded">Game Over! Your WPM: {{ wpm }}</p>
+        <button @click="startGame" v-if="!gameStarted" :class="{'play-btn': true}">Start Game</button>
       </div>
     </div>
   </template>
@@ -34,14 +36,16 @@
       const gameEnded = ref(false);
       const startTime = ref(0);
       const endTime = ref(0);
-  
+   
+      let curCharTextColor = "black";
+
       const wpm = computed(() => {
         if (!gameEnded.value) return 0;
         const timeInMinutes = (endTime.value - startTime.value) / 60000;
         const wordsTyped = currentText.value.split(' ').length;
         return Math.round(wordsTyped / timeInMinutes);
       });
-  
+
       function startGame() {
         currentText.value = texts[Math.floor(Math.random() * texts.length)];
         userInput.value = '';
@@ -49,25 +53,82 @@
         gameEnded.value = false;
         startTime.value = Date.now();
       }
-  
+      let keysPresseedIterator = 0;
+     
+      let backspacePressed = false;
+
       function checkInput() {
-        if (userInput.value === currentText.value) {
-          endTime.value = Date.now();
-          gameEnded.value = true;
-        }
+        let userInputChar = userInput.value.split('');
+        let charsToType = currentText.value.split('')
+        console.log(keysPresseedIterator)
+          if (userInputChar[keysPresseedIterator] != undefined && (userInputChar[keysPresseedIterator] === charsToType[keysPresseedIterator])) {
+            // console.log("User input " + userInputChar[keysPresseedIterator]);
+            // console.log("TO  TYPE   " + charsToType[keysPresseedIterator])
+
+            curCharTextColor = "green";
+            console.log(keysPresseedIterator)
+            if (keysPresseedIterator === charsToType.length - 1){
+              endTime.value = Date.now();
+              gameEnded.value = true;
+              keysPresseedIterator = -1;
+
+            }
+          } else {
+            curCharTextColor = "red";
+            // console.log("User input " + userInputChar[keysPresseedIterator]);
+            // console.log("TO  TYPE   " + charsToType[keysPresseedIterator]);
+          }
+          if (!backspacePressed) {
+            keysPresseedIterator++;
+          } else {
+            backspacePressed = false;
+          }
+
+        
       }
-  
+      function handleKeydown(event) {
+          if (event.key === "Backspace") {
+            backspacePressed = true;
+            keysPresseedIterator = (userInput.value.split('')).length -1;
+            if (keysPresseedIterator < -1) {
+              keysPresseedIterator = 0;
+            }
+          }
+        }
+      const inputTextStyle = computed(() => {
+        // console.log(userInput.value)
+
+        return {
+          color: userInput.value ? curCharTextColor : "black" ,
+        };
+      });
       return {
         currentText,
         userInput,
         gameStarted,
         gameEnded,
         wpm,
+        inputTextStyle,
         startGame,
         checkInput,
+        handleKeydown,
       };
+
     },
-  };
+    watch: {
+      gameEnded(isEnded) {
+        if (isEnded) {
+          this.gameStarted = false;
+        }
+      },
+      // userInput(text) {
+      //   userInputCharacters = text.split('')
+
+      // }
+      
+    }
+
+  }
   </script>
   
   <style scoped>
@@ -99,4 +160,29 @@
     font-size: 1em;
     cursor: pointer;
   }
+
+  @keyframes color-animation {
+    0% {
+      background-position: 0% 0%;
+    }
+    100% {
+      background-position: 100% 100%;
+
+    }
+  }
+
+  .play-btn {
+    background: linear-gradient(45deg,#FFC3A8, #F57E9A, #EB3E8C, #D61F77, #B70159,
+    #8E44AD, #3498DB, #2ECC71, #F1C40F, #E67E22, #FFC3A8, #E67E22);
+    background-size: 300% 200%;
+    animation: color-animation 5s ease infinite alternate;
+  }
+
+  .input {
+    border: 2px solid yellow; /* Example style for the class */
+  }
+
+
+
+  
   </style>
