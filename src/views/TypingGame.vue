@@ -56,7 +56,7 @@
         gameEnded.value = false;
         startTime.value = Date.now();
       }
-      let keysPresseedIterator = 0;
+      let keysPressedIterator = 0;
       let backspacePressed = false;
 
       function checkInput() {  
