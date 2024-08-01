@@ -62,8 +62,9 @@
       function checkInput() {  
         let userInputChar = userInput.value.split('');
         let charsToType = currentText.value.split('') 
-
-          if (userInputChar[keysPresseedIterator] != undefined && (userInputChar[keysPresseedIterator] === charsToType[keysPresseedIterator])) {
+        let inputChar = userInputChar[keysPresseedIterator]
+        
+        if (inputChar === charsToType[keysPresseedIterator])) {
             curCharTextColor = "green";
             if ((keysPresseedIterator === charsToType.length - 1) && (JSON.stringify(userInputChar) === JSON.stringify(charsToType))){
               endTime.value = Date.now();
