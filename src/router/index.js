@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import homepage from '@/views/Home.vue'
-import TypingGame from '@/views/TypingGame.vue'  // Add this line
+import TypingGame from '@/views/TypingGame.vue'
 
 const routes = [
   {

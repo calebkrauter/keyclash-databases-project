@@ -27,7 +27,6 @@
         <h2 ref="popOutText" class="pop-out-text">Here we are!</h2>
       </span>
   
-      <!-- Additional content for the about section can be added here -->
     </section>
   </div>
 </template>
