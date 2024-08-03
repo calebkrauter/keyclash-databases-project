@@ -5,8 +5,8 @@
         </div>
         <ul class="nav-links">
             <li><a href="/">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#about-us">About us</a></li>
+            <li><a href="/#about">About</a></li>
+            <li><a href="/#about-us">About us</a></li>
         </ul>
     </nav>
 </template>
@@ -40,7 +40,12 @@ export default {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 2rem;
-    background-color:aliceblue;
+    background-image: linear-gradient(to right,
+        #FFC3A8, 
+        #F57E9A, 
+        #EB3E8C, 
+        #D61F77, 
+        #B70159);
 
     /* Add these lines for the fade-in effect */
     animation: fadeIn 2s ease-in-out forwards;
@@ -66,6 +71,6 @@ export default {
 
 .nav-links a {
     text-decoration: none;
-    color: #333;
+    color: #ffffff;
 }
 </style>
