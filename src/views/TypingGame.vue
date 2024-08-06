@@ -133,66 +133,7 @@
       }
   
   </script>
-  
-  <style scoped>
-  .typing-game {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    text-align: center;
-  }
-  
-  .game-area {
-    margin-top: 20px;
-  }
-  
-  .text-to-type {
-    font-size: 1.2em;
-    margin-bottom: 20px;
-  }
-  
-  input {
-    width: 20%;
-    padding: 10px;
-    font-size: 1em;
-    margin-bottom: 20px;
-    background-color: #fafcff;
-    border-color: black;
-    border-radius: 10px;
-  }
 
-  button {
-    padding: 10px 20px;
-    font-size: 1em;
-    cursor: pointer;
-    border-radius: 10px;
-  }
-}
-
-function handleKeydown(event) {
-  if (event.key === "Backspace") {
-    backspacePressed.value = true;
-    keysPressedIterator.value = (userInput.value.split('')).length - 1;
-    if (keysPressedIterator.value < -1) {
-      keysPressedIterator.value = 0;
-    }
-  } else if (event.ctrlKey && event.key === "v") {
-    pasted.value = true;
-  }
-}
-
-const inputTextStyle = computed(() => {
-  return {
-    color: userInput.value ? curCharTextColor.value : "black",
-  };
-});
-
-watch(gameEnded, (isEnded) => {
-  if (isEnded) {
-    gameStarted.value = false;
-  }
-});
-</script>
 
 <style scoped>
 .typing-game {
