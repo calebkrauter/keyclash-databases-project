@@ -1,5 +1,6 @@
-<!-- src/views/TypingGame.vue -->
+
 <template>
+
     <div class="typing-game">
       <h1>Let The Battle Begin!</h1>
       <div class="game-area">
@@ -166,25 +167,85 @@
     cursor: pointer;
     border-radius: 10px;
   }
+}
 
-  @keyframes color-animation {
-    0% {
-      background-position: 0% 0%;
+function handleKeydown(event) {
+  if (event.key === "Backspace") {
+    backspacePressed.value = true;
+    keysPressedIterator.value = (userInput.value.split('')).length - 1;
+    if (keysPressedIterator.value < -1) {
+      keysPressedIterator.value = 0;
     }
-    100% {
-      background-position: 100% 100%;
+  } else if (event.ctrlKey && event.key === "v") {
+    pasted.value = true;
+  }
+}
 
-    }
+const inputTextStyle = computed(() => {
+  return {
+    color: userInput.value ? curCharTextColor.value : "black",
+  };
+});
+
+watch(gameEnded, (isEnded) => {
+  if (isEnded) {
+    gameStarted.value = false;
+  }
+});
+</script>
+
+<style scoped>
+.typing-game {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.game-area {
+  margin-top: 20px;
+}
+
+
+.text-to-type {
+  font-size: 1.2em;
+  margin-bottom: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1em;
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+@keyframes color-animation {
+  0% {
+    background-position: 0% 0%;
   }
 
-  .play-btn {
-    background: linear-gradient(45deg,#FFC3A8, #F57E9A, #EB3E8C, #D61F77, #B70159,
-    #8E44AD, #3498DB, #2ECC71, #F1C40F, #E67E22, #FFC3A8, #E67E22);
-    background-size: 300% 200%;
-    animation: color-animation 5s ease infinite alternate;
-  }
+  100% {
+    background-position: 100% 100%;
 
-  .input {
-    border: 2px solid yellow; /* Example style for the class */
-  }  
-  </style>
+  }
+}
+
+.play-btn {
+  background: linear-gradient(45deg, #FFC3A8, #F57E9A, #EB3E8C, #D61F77, #B70159,
+      #8E44AD, #3498DB, #2ECC71, #F1C40F, #E67E22, #FFC3A8, #E67E22);
+  background-size: 300% 200%;
+  animation: color-animation 5s ease infinite alternate;
+}
+
+.input {
+  border: 2px solid yellow;
+  /* Example style for the class */
+}
+</style>
+
