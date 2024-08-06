@@ -34,12 +34,84 @@
   
   <script setup>
     import { ref, computed } from 'vue';
+    // Reference: ChatGPT4o was used to generate random data and simple code to house it for generating sentences.
+    const nouns = [
+      "cat", "dog", "car", "house", "tree", "computer", "book", "phone", "river", "mountain",
+      "child", "teacher", "city", "ocean", "star", "bicycle", "flower", "shoe", "bird", "pencil"
+    ];
+
+    const verbs = [
+      "run", "jump", "swim", "drive", "read", "write", "sing", "dance", "cook", "play",
+      "study", "teach", "paint", "draw", "build", "fix", "throw", "catch", "fly", "climb"
+    ];
+
+    const adjectives = [
+      "happy", "sad", "bright", "dark", "tall", "short", "fast", "slow", "loud", "quiet",
+      "hot", "cold", "new", "old", "young", "strong", "weak", "smooth", "rough", "soft"
+    ];
+
+    const adverbs = [
+      "quickly", "slowly", "loudly", "quietly", "happily", "sadly", "gracefully", "clumsily", "brightly", "darkly",
+      "bravely", "cowardly", "calmly", "angrily", "easily", "hardly", "warmly", "coldly", "seriously", "jokingly"
+    ];
+
+    const pronouns = [
+      "he", "she", "it", "they", "we", "I", "you", "him", "her", "them",
+      "us", "me", "myself", "yourself", "himself", "herself", "itself", "ourselves", "yourselves", "themselves"
+    ];
+
+    const prepositions = [
+      "in", "on", "at", "by", "with", "about", "against", "between", "into", "through",
+      "during", "before", "after", "above", "below", "to", "from", "up", "down", "out"
+    ];
+
+    const conjunctions = [
+      "and", "but", "or", "so", "because", "although", "since", "if", "when", "while",
+      "where", "after", "before", "until", "unless", "whether", "though", "once", "than", "even though"
+    ];
+
+    const modals = [
+      "can", "could", "may", "might", "must", "shall", "should", "will", "would", "ought to",
+      "have to", "need to", "used to", "be able to", "be going to", "would like to", "shall", "will", "should", "might"
+    ];
+
+    const infinitives = [
+      "to run", "to jump", "to swim", "to drive", "to read", "to write", "to sing", "to dance", "to cook", "to play",
+      "to study", "to teach", "to paint", "to draw", "to build", "to fix", "to throw", "to catch", "to fly", "to climb"
+    ];
+
+    const gerunds = [
+      "running", "jumping", "swimming", "driving", "reading", "writing", "singing", "dancing", "cooking", "playing",
+      "studying", "teaching", "painting", "drawing", "building", "fixing", "throwing", "catching", "flying", "climbing"
+    ];
+    const items = [
+      "chair", "table", "lamp", "sofa", "bed", "desk", "cabinet", "television", "rug", "shelf",
+      "couch", "dresser", "stove", "microwave", "refrigerator", "toaster", "blender", "coffee maker", "oven", "bookshelf"
+    ];
+
+    const wordIndexMax = 19;
+    const wordIndexMin = 0;
+    const multiplyer = (wordIndexMax - wordIndexMin) + wordIndexMin;
+    const space = " ";
+    const period = ".";
+    console.log(Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin))
     const texts = [
-        "The quick brown fox jumps over the lazy dog.",
-        "Programming is the art of telling another human what one wants the computer to do.",
-        "The only way to learn a new programming language is by writing programs in it.",
+        nouns[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + space + verbs[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + space + adverbs[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + period,
+        nouns[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + space + verbs[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + space + adjectives[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + space + nouns[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + period,
+        adverbs[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + space + nouns[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + space + verbs[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + space + items[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + period,
       ];
-  
+
+      /**   "Noun, Verb, Object",
+  "Noun, Verb, Adverb",
+  "Noun, Adjective, Noun, Verb",
+  "Noun, Verb, Adjective, Noun",
+  "Adverb, Noun, Verb, Object",
+  "Noun, Verb, Prepositional Phrase",
+  "Adjective, Noun, Verb, Adverb",
+  "Noun, Modal Verb, Verb, Object",
+  "Pronoun, Verb, Adverb",
+  "Noun, Verb, Infinitive" */
+  // Article? Adjective, adjective, noun, verb adverb article 
       const currentText = ref('');
       const userInput = ref('');
       const userInputConstrained = ref('');
@@ -80,7 +152,7 @@
             event.preventDefault();
           }
         } else if (event.key === " ") {
-          if (userInput.value[keysPressedIterator.value-1] === " ") {
+          if (userInput.value[keysPressedIterator.value-1] === " " || userInput.value[keysPressedIterator.value-1] === undefined) {
             event.preventDefault();
           } else {
             curWordIndex++;
