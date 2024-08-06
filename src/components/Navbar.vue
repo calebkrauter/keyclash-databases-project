@@ -1,27 +1,32 @@
 <template>
-    <nav class="navbar">
+    <nav v-if="showNavbar" class="navbar">
+       
         <div class="logo">
             <img :src="keyclashlogo" alt="KeyClash Logo">
         </div>
         <ul class="nav-links">
             <li><a href="/">Home</a></li>
-            <li><a href="/#about">About</a></li>
-            <li><a href="/#about-us">About us</a></li>
+            <li><a href="/#about-game">About The Game</a></li>
+            <li><a href="/#meet-team">Meet The Team</a></li>
+            <li><router-link :to="{ path: '/Userauth', query: { mode: 'register' }}" class="registration">Register</router-link></li>
+            <li><router-link :to="{ path: '/Userauth', query: { mode: 'login' }}" class="registration">Login</router-link></li>
+    
         </ul>
     </nav>
 </template>
 
-<script>
+<script setup>
+import { ref, computed } from 'vue';
+import { useRoute } from 'vue-router';
 import keyclashlogo from '@/public/keyclashlogo.png'
 
-export default {
-    name: 'Navbar',
-    data() {
-        return {
-            keyclashlogo
-        }
-    }
-}
+const route = useRoute();
+
+const showNavbar = computed(() => {
+    const hiddenRoutes = ['/Userauth'];
+    return !hiddenRoutes.some(hiddenRoute => route.path.includes(hiddenRoute));
+});
+
 </script>
 
 <style scoped>

@@ -1,7 +1,4 @@
 <template>
-  <!-- Navigation component -->
-  <Navbar />
-
   <div class="home">
     <!-- Welcome Section -->
     <section class="welcome-section">
@@ -14,136 +11,144 @@
       </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="about-section">
-      <span class = about-content>
+    <!-- about-game Section -->
+    <section id="about-game" class="about-game-section">
+      <span class=about-game-content>
         <h2 ref="popOutText" class="pop-out-text">What is KeyClash</h2>
       </span>
-  
-      <!-- Additional content for the about section can be added here -->
+
+      <!-- Additional content for the about-game section can be added here -->
     </section>
-    <section id="about-us" class="about-us-section">
-      <span class = about-us-content>
+    <section id="meet-team" class="meet-team-section">
+      <span class=meet-team-content>
         <h2 ref="popOutText" class="pop-out-text">Here we are!</h2>
       </span>
-  
+
     </section>
   </div>
 </template>
 
-<script>
+<script setup>
 import { useRouter } from 'vue-router'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-export default {
-  name: 'Home',
-  setup() {
-    const popOutText = ref(null)
-    const router = useRouter()
+const popOutText = ref(null)
+const router = useRouter()
 
-    // Function to handle scroll event for pop-out text animation
-    const handleScroll = () => {
-      const popOutTexts = document.querySelectorAll('.pop-out-text')
-      
-      popOutTexts.forEach((element) => {
-        const position = element.getBoundingClientRect().top
-        const screenPosition = window.innerHeight / 1.1
+// Function to handle scroll event for pop-out text animation
+const handleScroll = () => {
+  const popOutTexts = document.querySelectorAll('.pop-out-text')
 
-        if (position < screenPosition) {
-          element.classList.add('visible')
-        } else {
-          element.classList.remove('visible')
-        }
-      })
-    }
-    // Lifecycle hooks
-    onMounted(() => {
-      window.addEventListener('scroll', handleScroll)
-    })
+  popOutTexts.forEach((element) => {
+    const position = element.getBoundingClientRect().top
+    const screenPosition = window.innerHeight / 1.1
 
-    onBeforeUnmount(() => {
-      window.removeEventListener('scroll', handleScroll)
-    })
-    const startGame = () => {
-      router.push('/game')
+    if (position < screenPosition) {
+      element.classList.add('visible')
+    } else {
+      element.classList.remove('visible')
     }
-    return {
-      popOutText,
-      handleScroll,
-      startGame
-    }
-  }
+  })
 }
+// Lifecycle hooks
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
+const startGame = () => {
+  router.push('/game')
+}
+
 </script>
 
 <style scoped>
 /* Keyframe Animations */
 @keyframes gradientShift {
 
-0%,
-100% {
-  background-position: 0% 0%;
-}
+  0%,
+  100% {
+    background-position: 0% 0%;
+  }
 
-10% {
-  background-position: 100% 0%;
-}
+  10% {
+    background-position: 100% 0%;
+  }
 
-20% {
-  background-position: 200% 100%;
-}
+  20% {
+    background-position: 200% 100%;
+  }
 
-30% {
-  background-position: 300% 200%;
-}
+  30% {
+    background-position: 300% 200%;
+  }
 
-40% {
-  background-position: 400% 300%;
-}
+  40% {
+    background-position: 400% 300%;
+  }
 
-50% {
-  background-position: 500% 400%;
-}
+  50% {
+    background-position: 500% 400%;
+  }
 
-60% {
-  background-position: 400% 500%;
-}
+  60% {
+    background-position: 400% 500%;
+  }
 
-70% {
-  background-position: 300% 600%;
-}
+  70% {
+    background-position: 300% 600%;
+  }
 
-80% {
-  background-position: 200% 700%;
-}
+  80% {
+    background-position: 200% 700%;
+  }
 
-90% {
-  background-position: 100% 800%;
-}
+  90% {
+    background-position: 100% 800%;
+  }
 }
 
 @keyframes typing {
-  from { width: 0 }
-  to { width: 100% }
+  from {
+    width: 0
+  }
+
+  to {
+    width: 100%
+  }
 }
 
 @keyframes fadeIn {
-  to { opacity: 1 }
+  to {
+    opacity: 1
+  }
 }
 
 @keyframes reveal {
-  0%, 99% {
+
+  0%,
+  99% {
     visibility: hidden;
     opacity: 0;
   }
+
   100% {
     visibility: visible;
     opacity: 1;
   }
 }
+
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
+
 /* General Styles */
 .home {
   text-align: center;
@@ -157,10 +162,10 @@ export default {
   justify-content: center;
   align-items: center;
   background: linear-gradient(45deg,
-    #FFC3A8, #F57E9A, #EB3E8C, #D61F77, #B70159,
-    #8E44AD, #3498DB, #2ECC71, #F1C40F, #E67E22, #FFC3A8);
+      #FFC3A8, #F57E9A, #EB3E8C, #D61F77, #B70159,
+      #8E44AD, #3498DB, #2ECC71, #F1C40F, #E67E22, #FFC3A8);
   background-size: 1000% 1000%;
-  animation: 
+  animation:
     fadeIn 1s ease-in-out forwards,
     gradientShift 120s ease-in-out infinite;
 }
@@ -172,11 +177,11 @@ export default {
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  
+
 }
 
-/* About Section Styles */
-.about-section {
+/* about-game Section Styles */
+.about-game-section {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -185,7 +190,8 @@ export default {
   padding: 2rem;
   background-color: #f0f0f0;
 }
-.about-us-section {
+
+.meet-team-section {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -196,7 +202,8 @@ export default {
 }
 
 /* Typography Styles */
-h1, p {
+h1,
+p {
   color: white;
   max-width: 100%;
 }
@@ -229,8 +236,10 @@ p.typing-animation {
   animation: reveal 0.1s linear forwards;
   animation-delay: 2.5s;
 }
-.fade-in{
-  opacity: 0; /* Start fully transparent */
+
+.fade-in {
+  opacity: 0;
+  /* Start fully transparent */
   animation: fadeIn 1s ease-in-out forwards;
   animation-delay: 5s;
 }
