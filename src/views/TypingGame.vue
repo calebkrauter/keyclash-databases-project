@@ -24,20 +24,16 @@
           font-weight: 400;
           font-style: normal;"
         >{{userInputConstrained}}</p>
-        <p v-if="gameEnded">Game Over! Your WPM: {{ wpm }}</p>
+        <p style="margin-top: 40px;" v-if="gameEnded">Game Over! Your WPM: {{ wpm }}</p>
         <button @click="startGame" v-if="!gameStarted" :class="{'play-btn': true}">Start Game</button>
-        <p v-if="pasteToWin">We don't allow PASTE TO WIN...</p>
+        <p style="margin-top: 40px;" v-if="pasteToWin">We don't allow PASTE TO WIN...</p>
       </div>
     </div>
   </template>
   
-  <script>
-  import { ref, computed } from 'vue';
-  
-  export default {
-    name: 'TypingGame',
-    setup() {
-      const texts = [
+  <script setup>
+    import { ref, computed } from 'vue';
+    const texts = [
         "The quick brown fox jumps over the lazy dog.",
         "Programming is the art of telling another human what one wants the computer to do.",
         "The only way to learn a new programming language is by writing programs in it.",
@@ -49,12 +45,11 @@
       const gameStarted = ref(false);
       const gameEnded = ref(false);
       const pasteToWin = ref(false);
-      const pasted= ref(false);
       const startTime = ref(0);
       const endTime = ref(0);
       let curWordIndex = 0;
       let curCharTextColor = "black";
-
+      let pasteDoneOnce = false;
       const wpm = computed(() => {
         if (!gameEnded.value) return 0;
         const timeInMinutes = (endTime.value - startTime.value) / 60000;
@@ -72,46 +67,6 @@
       }
       const keysPressedIterator = ref(0);
       let backspacePressed = false;
-
-      function checkInput() {  
-        let userInputChar = userInput.value.split('');
-        let curWord = userInput.value.split(' ');
-        userInputConstrained.value = curWord[curWordIndex];
-        let charsToType = currentText.value.split('') 
-        let inputChar = userInputChar[keysPressedIterator.value]
-        if (inputChar === charsToType[keysPressedIterator.value]) { 
-            curCharTextColor = "green";
-        } else {
-          curCharTextColor = "red";
-        }
-        if (curWordIndex >= currentText.value.split(' ').length) {
-          endTime.value = Date.now();
-          gameEnded.value = true;
-          curWordIndex = 0;
-          keysPressedIterator.value = -1;
-          pasteToWin.value = false;
-        } else if ((JSON.stringify(userInputChar) === JSON.stringify(charsToType)) && curWordIndex != currentText.value.split(' ').length - 1) {
-          pasteToWin.value = true;
-        } 
-        
-        if (!backspacePressed) {
-          keysPressedIterator.value++;
-        } else {
-          keysPressedIterator.value = userInputChar.length;
-          backspacePressed = false;
-        }
-        if (userInputChar.length <= 0) {
-          keysPressedIterator.value = 0;
-        }
-        if (pasted.value || pasteToWin.value) {
-          userInput.value = '';
-          userInputChar = userInput.value.split('');
-          keysPressedIterator.value = -1;
-          curCharTextColor = "red";
-          pasted.value = false;
-        }
-          
-      }
       function handleKeydown(event) {
         if (event.key === "Backspace" && event.key !== "Space") {
           if (userInput.value[keysPressedIterator.value-1] !== " ") {
@@ -130,7 +85,8 @@
             curWordIndex++;
           }
         } else if (event.ctrlKey && event.key === "v") {
-          pasted.value = true;
+          pasteToWin.value = true;
+          event.preventDefault();
         }
       }
       const inputTextStyle = computed(() => {
@@ -139,30 +95,42 @@
           color: curKey[keysPressedIterator.value-1] ? curCharTextColor : "black",
         };
       });
-      return {
-        currentText,
-        userInput,
-        gameStarted,
-        gameEnded,
-        wpm,
-        inputTextStyle,
-        startGame,
-        checkInput,
-        handleKeydown,
-        pasteToWin,
-        userInputConstrained,
-      };
 
-    },
-    watch: {
-      gameEnded(isEnded) {
-        if (isEnded) {
-          this.gameStarted = false;
+      function checkInput() {  
+        let userInputChar = userInput.value.split('');
+        let curWord = userInput.value.split(' ');
+        userInputConstrained.value = curWord[curWordIndex];
+        let charsToType = currentText.value.split('') 
+        let inputChar = userInputChar[keysPressedIterator.value]
+        if (inputChar === charsToType[keysPressedIterator.value]) { 
+            curCharTextColor = "green";
+        } else {
+          curCharTextColor = "red";
         }
-      },
-    }
-
-  }
+        if (curWordIndex >= currentText.value.split(' ').length) {
+          endTime.value = Date.now();
+          gameEnded.value = true;
+          curWordIndex = 0;
+          keysPressedIterator.value = -1;
+          pasteToWin.value = false;
+          pasteDoneOnce = false;
+          gameStarted.value = false;
+        }        
+        if (!backspacePressed) {
+          keysPressedIterator.value++;
+        } else {
+          keysPressedIterator.value = userInputChar.length;
+          backspacePressed = false;
+        }
+        if (userInputChar.length <= 0) {
+          keysPressedIterator.value = 0;
+        }
+      }
+ 
+      if (gameStarted.value) {
+        gameStarted.value = false;
+      }
+  
   </script>
   
   <style scoped>
@@ -218,9 +186,5 @@
 
   .input {
     border: 2px solid yellow; /* Example style for the class */
-  }
-
-
-
-  
+  }  
   </style>
