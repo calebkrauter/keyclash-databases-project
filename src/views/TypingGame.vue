@@ -79,13 +79,11 @@
         userInputConstrained.value = curWord[curWordIndex];
         let charsToType = currentText.value.split('') 
         let inputChar = userInputChar[keysPressedIterator.value]
-        // console.log(userInputChar[keysPressedIterator.value]);
         if (inputChar === charsToType[keysPressedIterator.value]) { 
             curCharTextColor = "green";
         } else {
           curCharTextColor = "red";
         }
-        // if ((keysPressedIterator.value === charsToType.length - 1) && (JSON.stringify(userInputChar) === JSON.stringify(charsToType))){
         if (curWordIndex >= currentText.value.split(' ').length) {
           endTime.value = Date.now();
           gameEnded.value = true;
@@ -126,14 +124,17 @@
             event.preventDefault();
           }
         } else if (event.key === " ") {
-          curWordIndex++;
+          if (userInput.value[keysPressedIterator.value-1] === " ") {
+            event.preventDefault();
+          } else {
+            curWordIndex++;
+          }
         } else if (event.ctrlKey && event.key === "v") {
           pasted.value = true;
         }
       }
       const inputTextStyle = computed(() => {
         let curKey = userInput.value.split('');
-        // curKey[keysPressedIterator.value-1]
         return {
           color: curKey[keysPressedIterator.value-1] ? curCharTextColor : "black",
         };
