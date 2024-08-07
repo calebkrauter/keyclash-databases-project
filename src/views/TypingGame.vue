@@ -89,6 +89,32 @@
       "couch", "dresser", "stove", "microwave", "refrigerator", "toaster", "blender", "coffee maker", "oven", "bookshelf"
     ];
 
+    const tenseWords = [
+      "present",    // e.g., "run"
+      "past",       // e.g., "ran"
+      "future",     // e.g., "will run"
+      "presentContinuous", // e.g., "running"
+      "pastContinuous",    // e.g., "was running"
+      "presentPerfect",    // e.g., "have run"
+      "pastPerfect",       // e.g., "had run"
+      "futureContinuous",  // e.g., "will be running"
+      "futurePerfect",     // e.g., "will have run"
+      "conditional"        // e.g., "would run"
+    ];
+    const tensePostfixes = [
+      "ing",        // Present Continuous, Gerunds
+      "ed",         // Past Simple
+      "s",          // Present Simple (third person singular)
+      "en",         // Past Participle (e.g., "written")
+      "will",       // Future Simple
+      "was/were",   // Past Continuous
+      "have/has",   // Present Perfect
+      "had",        // Past Perfect
+      "be",         // Future Continuous
+      "would"       // Conditional
+    ];
+
+    let chooseTense = Math.floor(Math.random() * (tenseWords.length - 0) + 0);
     const wordIndexMax = 19;
     const wordIndexMin = 0;
     const multiplyer = (wordIndexMax - wordIndexMin) + wordIndexMin;
