@@ -34,202 +34,164 @@
   
   <script setup>
     import { ref, computed } from 'vue';
-    // Reference: ChatGPT4o was used to generate random data and simple code to house it for generating sentences.
-    const nouns = [
-      "cat", "dog", "car", "house", "tree", "computer", "book", "phone", "river", "mountain",
-      "child", "teacher", "city", "ocean", "star", "bicycle", "flower", "shoe", "bird", "pencil"
+    // Reference: Claude AI and ChatGPT4o/3 were used to help with word generation and simple code to house it.
+    // TODO ask AI if the word types are correct.
+    const present = [
+      ['a', 'the'],
+      ['he', 'she', 'it'],
+      ['walks', 'runs', 'jumps', 'sings', 'dances', 'plays', 'reads', 'writes', 'eats', 'drinks', 'sleeps', 'works', 'talks', 'listens', 'thinks', 'feels', 'sees', 'hears', 'smells', 'touches', 'learns', 'teaches', 'explores', 'discovers', 'imagines', 'wonders', 'hopes', 'dreams', 'believes'],
+      ['quickly', 'slowly', 'gracefully', 'happily', 'loudly', 'silently', 'easily', 'angrily', 'brightly', 'carefully', 'calmly', 'eagerly', 'sharply', 'quietly', 'gently', 'firmly', 'rapidly', 'smoothly', 'softly', 'boldly', 'secretly', 'roughly', 'cheerfully', 'awkwardly', 'nervously', 'constantly', 'rarely', 'frequently', 'suddenly', 'briefly', 'vividly', 'politely', 'warmly', 'gratefully', 'cautiously'],    ['fence', 'tree', 'ball', 'book', 'flower', 'tower', 'chair', 'car', 'cloud', 'river', 'mountain', 'house', 'sun', 'apple', 'desk', 'bird', 'moon', 'glass', 'cat', 'dog', 'pencil', 'table', 'window', 'door', 'street', 'clock', 'leaf', 'pond', 'butterfly', 'bicycle', 'computer', 'guitar', 'flower', 'hat'],    
+      ['dog', 'cat', 'bird', 'person', 'child', 'woman', 'man', 'horse'],
+      ["about","above","across","after","against","along","among","around","at","before","behind","below","beneath","beside","beyond","by","down","during","for","from","in","inside","into","like","near","off","on","onto","out","outside","over","through","to","toward","under","underneath","up","upon","with","within","without"],
+      ["big", "small", "red", "blue", "green", "yellow", "tall", "short", "fast", "slow", "happy", "sad", "loud", "quiet", "soft", "hard", "new", "good", "bad", "beautiful", "ugly", "smart", "silly", "brave", "afraid", "strong", "weak", "warm", "cold", "dry", "wet", "rough", "smooth", "sharp", "dull", "heavy", "light", "narrow", "wide", "deep", "shallow", "bright", "dark", "clean", "dirty", "thin", "thick", "long", "short", "young", "modern", "ancient", "expensive", "cheap", "valuable", "worthless", "famous", "certain", "clear", "boring", "comfortable", "delicious", "disgusting", "dangerous", "safe"],
+      ['is', 'seems', 'becomes', 'appears', 'feels', 'looks', 'sounds', 'smells', 'tastes', 'remains', 'grows', 'stays', 'turns', 'sits', 'stands', 'falls', 'fades', 'shines', 'feels', 'moves', 'acts', 'sounds', 'becomes', 'feels', 'seems', 'grows', 'appears', 'looks', 'remains', 'seems', 'turns', 'stays', 'feels', 'appears', 'sounds', 'turns'],
+      ['and', 'but', 'or'],
     ];
+    const wordType = {
+      article: 0,
+      person: 1,
+      verb: 2,
+      adverb: 3,
+      objectNoun: 4,
+      subject: 5,
+      preposition: 6,
+      adjective: 7,
+      linkingVerb: 8,
+      conjunction: 9,
+    }
+  
+    const sentence = [
+      [wordType.article, wordType.subject, wordType.adverb, wordType.verb, wordType.preposition, wordType.article, wordType.adjective, wordType.objectNoun],
+      [wordType.person, wordType.verb, wordType.adverb, wordType.conjunction, wordType.linkingVerb, wordType.article, wordType.adjective, wordType.objectNoun],
+    ]
 
-    const verbs = [
-      "run", "jump", "swim", "drive", "read", "write", "sing", "dance", "cook", "play",
-      "study", "teach", "paint", "draw", "build", "fix", "throw", "catch", "fly", "climb"
-    ];
-
-    const adjectives = [
-      "happy", "sad", "bright", "dark", "tall", "short", "fast", "slow", "loud", "quiet",
-      "hot", "cold", "new", "old", "young", "strong", "weak", "smooth", "rough", "soft"
-    ];
-
-    const adverbs = [
-      "quickly", "slowly", "loudly", "quietly", "happily", "sadly", "gracefully", "clumsily", "brightly", "darkly",
-      "bravely", "cowardly", "calmly", "angrily", "easily", "hardly", "warmly", "coldly", "seriously", "jokingly"
-    ];
-
-    const pronouns = [
-      "he", "she", "it", "they", "we", "I", "you", "him", "her", "them",
-      "us", "me", "myself", "yourself", "himself", "herself", "itself", "ourselves", "yourselves", "themselves"
-    ];
-
-    const prepositions = [
-      "in", "on", "at", "by", "with", "about", "against", "between", "into", "through",
-      "during", "before", "after", "above", "below", "to", "from", "up", "down", "out"
-    ];
-
-    const conjunctions = [
-      "and", "but", "or", "so", "because", "although", "since", "if", "when", "while",
-      "where", "after", "before", "until", "unless", "whether", "though", "once", "than", "even though"
-    ];
-
-    const modals = [
-      "can", "could", "may", "might", "must", "shall", "should", "will", "would", "ought to",
-      "have to", "need to", "used to", "be able to", "be going to", "would like to", "shall", "will", "should", "might"
-    ];
-
-    const infinitives = [
-      "to run", "to jump", "to swim", "to drive", "to read", "to write", "to sing", "to dance", "to cook", "to play",
-      "to study", "to teach", "to paint", "to draw", "to build", "to fix", "to throw", "to catch", "to fly", "to climb"
-    ];
-
-    const gerunds = [
-      "running", "jumping", "swimming", "driving", "reading", "writing", "singing", "dancing", "cooking", "playing",
-      "studying", "teaching", "painting", "drawing", "building", "fixing", "throwing", "catching", "flying", "climbing"
-    ];
-    const items = [
-      "chair", "table", "lamp", "sofa", "bed", "desk", "cabinet", "television", "rug", "shelf",
-      "couch", "dresser", "stove", "microwave", "refrigerator", "toaster", "blender", "coffee maker", "oven", "bookshelf"
-    ];
-
-    const tenseWords = [
-      "present",    // e.g., "run"
-      "past",       // e.g., "ran"
-      "future",     // e.g., "will run"
-      "presentContinuous", // e.g., "running"
-      "pastContinuous",    // e.g., "was running"
-      "presentPerfect",    // e.g., "have run"
-      "pastPerfect",       // e.g., "had run"
-      "futureContinuous",  // e.g., "will be running"
-      "futurePerfect",     // e.g., "will have run"
-      "conditional"        // e.g., "would run"
-    ];
-    const tensePostfixes = [
-      "ing",        // Present Continuous, Gerunds
-      "ed",         // Past Simple
-      "s",          // Present Simple (third person singular)
-      "en",         // Past Participle (e.g., "written")
-      "will",       // Future Simple
-      "was/were",   // Past Continuous
-      "have/has",   // Present Perfect
-      "had",        // Past Perfect
-      "be",         // Future Continuous
-      "would"       // Conditional
-    ];
-
-    let chooseTense = Math.floor(Math.random() * (tenseWords.length - 0) + 0);
     const wordIndexMax = 19;
     const wordIndexMin = 0;
-    const multiplyer = (wordIndexMax - wordIndexMin) + wordIndexMin;
     const space = " ";
     const period = ".";
-    console.log(Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin))
-    const texts = [
-        nouns[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + space + verbs[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + space + adverbs[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + period,
-        nouns[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + space + verbs[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + space + adjectives[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + space + nouns[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + period,
-        adverbs[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + space + nouns[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + space + verbs[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + space + items[Math.floor(Math.random() * (wordIndexMax - wordIndexMin) + wordIndexMin)] + period,
-      ];
+    const texts = [];
 
-      /**   "Noun, Verb, Object",
-  "Noun, Verb, Adverb",
-  "Noun, Adjective, Noun, Verb",
-  "Noun, Verb, Adjective, Noun",
-  "Adverb, Noun, Verb, Object",
-  "Noun, Verb, Prepositional Phrase",
-  "Adjective, Noun, Verb, Adverb",
-  "Noun, Modal Verb, Verb, Object",
-  "Pronoun, Verb, Adverb",
-  "Noun, Verb, Infinitive" */
-  // Article? Adjective, adjective, noun, verb adverb article 
-      const currentText = ref('');
-      const userInput = ref('');
-      const userInputConstrained = ref('');
-      const gameStarted = ref(false);
-      const gameEnded = ref(false);
-      const pasteToWin = ref(false);
-      const startTime = ref(0);
-      const endTime = ref(0);
-      let curWordIndex = 0;
-      let curCharTextColor = "black";
-      let pasteDoneOnce = false;
-      const wpm = computed(() => {
-        if (!gameEnded.value) return 0;
-        const timeInMinutes = (endTime.value - startTime.value) / 60000;
-        const wordsTyped = currentText.value.split(' ').length;
-        return Math.round(wordsTyped / timeInMinutes);
-      });
 
-      function startGame() {
-        currentText.value = texts[Math.floor(Math.random() * texts.length)];
-        userInput.value = '';
-        userInputConstrained.value = '';
-        gameStarted.value = true;
-        gameEnded.value = false;
-        startTime.value = Date.now();
+    texts.push(generateSentence())
+    console.log(texts)
+    function generateSentence() {
+      return appendWord();
+    }
+
+    function appendWord() {
+      let firstWord = "";
+      let i = Math.floor(Math.random() * sentence.length);
+      let text = "";
+      for (let n = 0; n < sentence[i].length; n++) {
+        if (n === 0) {
+          firstWord = getWord(sentence[i][n]);
+          firstWord = firstWord[0].toUpperCase() + firstWord.slice(1)
+          text += firstWord;
+        } else {
+          console.log(sentence[i][n])
+          text += space.concat(getWord(sentence[i][n]));
+        }
       }
-      const keysPressedIterator = ref(0);
-      let backspacePressed = false;
-      function handleKeydown(event) {
-        if (event.key === "Backspace" && event.key !== "Space") {
-          if (userInput.value[keysPressedIterator.value-1] !== " ") {
-            backspacePressed = true;
-            keysPressedIterator.value = (userInput.value.split('')).length -1;
-            if (keysPressedIterator.value < -1) {
-              keysPressedIterator.value = 0;
-            }
-          } else {
-            event.preventDefault();
+      text += period;
+      return text;
+    }
+
+    function getWord(typeIndex) {
+      return present[typeIndex][Math.floor(Math.random() * (present[typeIndex].length - 0) + 0)];
+    }
+
+    const currentText = ref('');
+    const userInput = ref('');
+    const userInputConstrained = ref('');
+    const gameStarted = ref(false);
+    const gameEnded = ref(false);
+    const pasteToWin = ref(false);
+    const startTime = ref(0);
+    const endTime = ref(0);
+    let curWordIndex = 0;
+    let curCharTextColor = "black";
+    let pasteDoneOnce = false;
+    const wpm = computed(() => {
+      if (!gameEnded.value) return 0;
+      const timeInMinutes = (endTime.value - startTime.value) / 60000;
+      const wordsTyped = currentText.value.split(' ').length;
+      return Math.round(wordsTyped / timeInMinutes);
+    });
+
+    function startGame() {
+      currentText.value = texts[Math.floor(Math.random() * texts.length)];
+      userInput.value = '';
+      userInputConstrained.value = '';
+      gameStarted.value = true;
+      gameEnded.value = false;
+      startTime.value = Date.now();
+    }
+    const keysPressedIterator = ref(0);
+    let backspacePressed = false;
+    function handleKeydown(event) {
+      if (event.key === "Backspace" && event.key !== "Space") {
+        if (userInput.value[keysPressedIterator.value-1] !== " ") {
+          backspacePressed = true;
+          keysPressedIterator.value = (userInput.value.split('')).length -1;
+          if (keysPressedIterator.value < -1) {
+            keysPressedIterator.value = 0;
           }
-        } else if (event.key === " ") {
-          if (userInput.value[keysPressedIterator.value-1] === " " || userInput.value[keysPressedIterator.value-1] === undefined) {
-            event.preventDefault();
-          } else {
-            curWordIndex++;
-          }
-        } else if (event.ctrlKey && event.key === "v") {
-          pasteToWin.value = true;
+        } else {
           event.preventDefault();
         }
+      } else if (event.key === " ") {
+        if (userInput.value[keysPressedIterator.value-1] === " " || userInput.value[keysPressedIterator.value-1] === undefined) {
+          event.preventDefault();
+        } else {
+          curWordIndex++;
+        }
+      } else if (event.ctrlKey && event.key === "v") {
+        pasteToWin.value = true;
+        event.preventDefault();
       }
-      const inputTextStyle = computed(() => {
-        let curKey = userInput.value.split('');
-        return {
-          color: curKey[keysPressedIterator.value-1] ? curCharTextColor : "black",
-        };
-      });
+    }
+    const inputTextStyle = computed(() => {
+      let curKey = userInput.value.split('');
+      return {
+        color: curKey[keysPressedIterator.value-1] ? curCharTextColor : "black",
+      };
+    });
 
-      function checkInput() {  
-        let userInputChar = userInput.value.split('');
-        let curWord = userInput.value.split(' ');
-        userInputConstrained.value = curWord[curWordIndex];
-        let charsToType = currentText.value.split('') 
-        let inputChar = userInputChar[keysPressedIterator.value]
-        if (inputChar === charsToType[keysPressedIterator.value]) { 
-            curCharTextColor = "green";
-        } else {
-          curCharTextColor = "red";
-        }
-        if (curWordIndex >= currentText.value.split(' ').length) {
-          endTime.value = Date.now();
-          gameEnded.value = true;
-          curWordIndex = 0;
-          keysPressedIterator.value = -1;
-          pasteToWin.value = false;
-          pasteDoneOnce = false;
-          gameStarted.value = false;
-        }        
-        if (!backspacePressed) {
-          keysPressedIterator.value++;
-        } else {
-          keysPressedIterator.value = userInputChar.length;
-          backspacePressed = false;
-        }
-        if (userInputChar.length <= 0) {
-          keysPressedIterator.value = 0;
-        }
+    function checkInput() {  
+      let userInputChar = userInput.value.split('');
+      let curWord = userInput.value.split(' ');
+      userInputConstrained.value = curWord[curWordIndex];
+      let charsToType = currentText.value.split('') 
+      let inputChar = userInputChar[keysPressedIterator.value]
+      if (inputChar === charsToType[keysPressedIterator.value]) { 
+          curCharTextColor = "green";
+      } else {
+        curCharTextColor = "red";
       }
- 
-      if (gameStarted.value) {
+      if (curWordIndex >= currentText.value.split(' ').length) {
+        endTime.value = Date.now();
+        gameEnded.value = true;
+        curWordIndex = 0;
+        keysPressedIterator.value = -1;
+        pasteToWin.value = false;
+        pasteDoneOnce = false;
         gameStarted.value = false;
+      }        
+      if (!backspacePressed) {
+        keysPressedIterator.value++;
+      } else {
+        keysPressedIterator.value = userInputChar.length;
+        backspacePressed = false;
       }
-  
+      if (userInputChar.length <= 0) {
+        keysPressedIterator.value = 0;
+      }
+    }
+
+    if (gameStarted.value) {
+      gameStarted.value = false;
+    }
+
   </script>
 
 
