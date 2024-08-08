@@ -26,7 +26,7 @@
           font-style: normal;"
         >{{userInputConstrained}}</p>
         <p style="margin-top: 40px;" v-if="gameEnded">Game Over! Your WPM: {{ wpm }}</p>
-        <button @click="startGame" v-if="!gameStarted" :class="{'play-btn': true}">Start Game</button>
+        <button @click="startGame" v-if="!gameStarted && roundsEnded" :class="{'play-btn': true}">Start Game</button>
         <p style="margin-top: 40px;" v-if="pasteToWin">We don't allow PASTE TO WIN...</p>
       </div>
     </div>
@@ -43,7 +43,7 @@
       ['quickly', 'slowly', 'gracefully', 'happily', 'loudly', 'silently', 'easily', 'angrily', 'brightly', 'carefully', 'calmly', 'eagerly', 'sharply', 'quietly', 'gently', 'firmly', 'rapidly', 'smoothly', 'softly', 'boldly', 'secretly', 'roughly', 'cheerfully', 'awkwardly', 'nervously', 'constantly', 'rarely', 'frequently', 'suddenly', 'briefly', 'vividly', 'politely', 'warmly', 'gratefully', 'cautiously'],    ['fence', 'tree', 'ball', 'book', 'flower', 'tower', 'chair', 'car', 'cloud', 'river', 'mountain', 'house', 'sun', 'apple', 'desk', 'bird', 'moon', 'glass', 'cat', 'dog', 'pencil', 'table', 'window', 'door', 'street', 'clock', 'leaf', 'pond', 'butterfly', 'bicycle', 'computer', 'guitar', 'flower', 'hat'],    
       ['dog', 'cat', 'bird', 'person', 'child', 'woman', 'man', 'horse'],
       ["about","above","across","after","against","along","among","around","at","before","behind","below","beneath","beside","beyond","by","down","during","for","from","in","inside","into","like","near","off","on","onto","out","outside","over","through","to","toward","under","underneath","up","upon","with","within","without"],
-      ["big", "small", "red", "blue", "green", "yellow", "tall", "short", "fast", "slow", "happy", "sad", "loud", "quiet", "soft", "hard", "new", "good", "bad", "beautiful", "ugly", "smart", "silly", "brave", "afraid", "strong", "weak", "warm", "cold", "dry", "wet", "rough", "smooth", "sharp", "dull", "heavy", "light", "narrow", "wide", "deep", "shallow", "bright", "dark", "clean", "dirty", "thin", "thick", "long", "short", "young", "modern", "ancient", "expensive", "cheap", "valuable", "worthless", "famous", "certain", "clear", "boring", "comfortable", "delicious", "disgusting", "dangerous", "safe"],
+      ["big", "small", "red", "blue", "green", "yellow", "tall", "short", "fast", "slow", "happy", "sad", "loud", "quiet", "soft", "hard", "new", "good", "bad", "beautiful", "ugly", "smart", "silly", "brave", "afraid", "strong", "weak", "warm", "cold", "dry", "wet", "rough", "smooth", "sharp", "dull", "heavy", "light", "narrow", "wide", "deep", "shallow", "bright", "dark", "clean", "dirty", "thin", "thick", "long", "short", "young", "modern", "cheap", "valuable", "worthless", "famous", "certain", "clear", "boring", "comfortable", "delicious", "disgusting", "dangerous", "safe"],
       ['is', 'seems', 'becomes', 'appears', 'feels', 'looks', 'sounds', 'smells', 'tastes', 'remains', 'grows', 'stays', 'turns', 'sits', 'stands', 'falls', 'fades', 'shines', 'feels', 'moves', 'acts', 'sounds', 'becomes', 'feels', 'seems', 'grows', 'appears', 'looks', 'remains', 'seems', 'turns', 'stays', 'feels', 'appears', 'sounds', 'turns'],
       ['and', 'but', 'or'],
     ];
@@ -64,16 +64,13 @@
       [wordType.article, wordType.subject, wordType.adverb, wordType.verb, wordType.preposition, wordType.article, wordType.adjective, wordType.objectNoun],
       [wordType.person, wordType.verb, wordType.adverb, wordType.conjunction, wordType.linkingVerb, wordType.article, wordType.adjective, wordType.objectNoun],
     ]
-
-    const wordIndexMax = 19;
-    const wordIndexMin = 0;
     const space = " ";
     const period = ".";
     const texts = [];
+    const roundsToPlay = 3;
+    const curRound = ref(0);
 
-
-    texts.push(generateSentence())
-    console.log(texts)
+    
     function generateSentence() {
       return appendWord();
     }
@@ -104,6 +101,7 @@
     const userInput = ref('');
     const userInputConstrained = ref('');
     const gameStarted = ref(false);
+    const roundsEnded = ref(true);
     const gameEnded = ref(false);
     const pasteToWin = ref(false);
     const startTime = ref(0);
@@ -112,19 +110,23 @@
     let curCharTextColor = "black";
     let pasteDoneOnce = false;
     const wpm = computed(() => {
-      if (!gameEnded.value) return 0;
+      if (!gameEnded.value && !roundsEnded) return 0;
       const timeInMinutes = (endTime.value - startTime.value) / 60000;
       const wordsTyped = currentText.value.split(' ').length;
       return Math.round(wordsTyped / timeInMinutes);
     });
 
     function startGame() {
-      currentText.value = texts[Math.floor(Math.random() * texts.length)];
+      if (curRound.value === 0) {
+        startTime.value = Date.now();
+      }
+      texts.push(generateSentence());
+      roundsEnded.value = false;
+      currentText.value = texts[curRound.value];
       userInput.value = '';
       userInputConstrained.value = '';
       gameStarted.value = true;
       gameEnded.value = false;
-      startTime.value = Date.now();
     }
     const keysPressedIterator = ref(0);
     let backspacePressed = false;
@@ -169,13 +171,22 @@
         curCharTextColor = "red";
       }
       if (curWordIndex >= currentText.value.split(' ').length) {
-        endTime.value = Date.now();
-        gameEnded.value = true;
-        curWordIndex = 0;
-        keysPressedIterator.value = -1;
-        pasteToWin.value = false;
-        pasteDoneOnce = false;
-        gameStarted.value = false;
+        curRound.value++;
+        if (curRound.value >= roundsToPlay) {
+          endTime.value = Date.now();
+          gameEnded.value = true;
+          curWordIndex = 0;
+          curRound.value = 0;
+          keysPressedIterator.value = -1;
+          pasteToWin.value = false;
+          pasteDoneOnce = false;
+          gameStarted.value = false;
+          roundsEnded.value = true;
+        } else {
+          curWordIndex = 0;
+          keysPressedIterator.value = -1;
+          startGame();
+        }
       }        
       if (!backspacePressed) {
         keysPressedIterator.value++;
