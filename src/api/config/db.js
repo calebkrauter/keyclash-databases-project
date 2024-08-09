@@ -1,13 +1,21 @@
 const mysql = require('mysql2/promise');
-const config = require('../config');
+const dotenv = require('dotenv');
 
-async function query(sql, params) {
-    const connection = await mysql.createConnection(config.db);
-    const [results,] = await connection.execute(sql, params);
+// Load environment variables from the .env file
+dotenv.config();
 
-    return results;
-}
+// Create a pool using the database configuration
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  connectTimeout: parseInt(process.env.DB_CONNECT_TIMEOUT, 10),
+});
 
-module.exports = {
-    query
-}
+module.exports = pool;
+
+console.log('DB_HOST:', process.env.DB_HOST);
+console.log('DB_USER:', process.env.DB_USER);
+console.log('DB_PASSWORD:', process.env.DB_PASSWORD);
+console.log('DB_NAME:', process.env.DB_NAME);

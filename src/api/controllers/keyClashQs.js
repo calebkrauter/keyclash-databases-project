@@ -1,58 +1,73 @@
-const db = require('./db');
-const helper = require('../helper');
-const config = require('../config');
+const pool = require('../config/db');
 
-// get lifetime leaderboard.
 async function getLeaderboard() {
-    const rows = await db.query(
-        `SELECT us.username, hsr.ranking
-        FROM userscore us
-        JOIN highscoreranking hsr ON us.highscore 
-        BETWEEN hsr.highscore_range_start AND hsr.highscore_range_end
-        ORDER BY us.highscore DESC;`
-    );
-    const data = helper.emptyOrRows(rows);
+  const sql = `
+    SELECT us.username, hsr.ranking
+    FROM userscore us
+    JOIN highscoreranking hsr ON us.highscore 
+    BETWEEN hsr.highscore_range_start AND hsr.highscore_range_end
+    ORDER BY us.highscore DESC
+  `;
 
-    return {
-        data
-    }
+  try {
+    const [rows] = await pool.query(sql);
+    return { data: rows };
+  } catch (err) {
+    throw err;
+  }
 }
 
-// Get leaderboard from today's attempts.
 async function getDailyLB() {
-    const rows = await db.query(
-        `SELECT us.username, dl.top_daily_attempt, us.highscore
-        FROM userscore us
-        JOIN dailyleaderboard dl ON us.username = dl.username
-        ORDER BY us.highscore DESC, ua.accuracy_percentage DESC;`
-    );
-    const data = helper.emptyOrRows(rows);
+  const sql = `
+    SELECT us.username, dl.top_daily_attempt, us.highscore
+    FROM userscore us
+    JOIN dailyleaderboard dl ON us.username = dl.username
+    ORDER BY us.highscore DESC, dl.top_daily_attempt DESC
+  `;
 
-    return {
-        data
-    }
+  try {
+    const [rows] = await pool.query(sql);
+    return { data: rows };
+  } catch (err) {
+    throw err;
+  }
 }
 
-// add a new user to the database.
 async function insertUser(username, email, password_hash) {
-    const rows = await db.query(
-        `INSERT INTO userinfo (username, name,         password_hash) VALUES
-         (${username}, ${email}, ${password_hash})`
-    );
+  const sql = `
+    INSERT INTO userinfo (username, email, password_hash) 
+    VALUES (?, ?, ?)
+  `;
+
+  try {
+    console.log('Attempting to insert user:', { username, email });
+    const [result] = await pool.query(sql, [username, email, password_hash]);
+    console.log('User inserted successfully:', result);
+    return { id: result.insertId, username, email };
+  } catch (err) {
+    console.error('Error in insertUser:', err);
+    console.error('Error stack:', err.stack);
+    throw err;
+  }
 }
 
-// user must already exist in database.
-async function insertAttempt({username}, characters_attempted, characters_missed, wpm) {
-    const rows = await db.query(
-        `INSERT INTO UserAttempts (username, characters_attempted,
-         characters_missed, wpm) VALUES
-         (${username}, ${characters_attempted}, ${characters_missed}, ${wpm});`
-    );
+async function insertAttempt(username, characters_attempted, characters_missed, wpm) {
+  const sql = `
+    INSERT INTO UserAttempts (username, characters_attempted, characters_missed, wpm) 
+    VALUES (?, ?, ?, ?)
+  `;
+
+  try {
+    const [result] = await pool.query(sql, [username, characters_attempted, characters_missed, wpm]);
+    return { id: result.insertId, username, wpm };
+  } catch (err) {
+    throw err;
+  }
 }
 
 module.exports = {
-    getLeaderboard,
-    getDailyLB,
-    insertUser,
-    insertAttempt
-}
+  getLeaderboard,
+  getDailyLB,
+  insertUser,
+  insertAttempt
+};

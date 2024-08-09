@@ -12,7 +12,6 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import Navbar from '@/components/Navbar.vue'
 import { RouterView } from 'vue-router';
-import { createPinia } from 'pinia';
 
 const route = useRoute();
 

@@ -1,14 +1,19 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const keyClashQs = require('../services/keyClashQs');
+const { insertUser } = require("../controllers/keyClashQs");
 
-/* GET queries. */
-router.get('/', async function(req, res, next) {
+router.post("/register", async (req, res, next) => {
   try {
-    res.json(await keyClashQs.getLeaderboard());
-  } catch (err) {
-    console.error(`Error while getting leaderboard `, err.message);
-    next(err);
+    console.log('Received registration request:', req.body);
+    const { username, email, password_hash } = req.body;
+    if (!username || !email || !password_hash) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    const result = await insertUser(username, email, password_hash);
+    res.status(200).json({ message: 'Registration successful', user: result });
+  } catch (error) {
+    console.error('Registration error:', error);
+    next(error);
   }
 });
 
