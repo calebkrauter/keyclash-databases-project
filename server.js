@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { insertUser } = require('./src/api/controllers/keyClashQs');
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 
 app.use(cors());
 app.use(express.json());
