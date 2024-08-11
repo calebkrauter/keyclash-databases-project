@@ -1,6 +1,5 @@
-
 <template>
-
+  <div class="game-container">
     <div class="typing-game">
       <h1>Let The Battle Begin!</h1>
       <div class="game-area">
@@ -14,7 +13,6 @@
           placeholder="Type here..."
           style="color: transparent"
         />
-        <!-- Reference for font from Google: https://fonts.google.com/selection/embed -->
         <p 
           id="userInput" 
           v-show="gameStarted"
@@ -30,15 +28,25 @@
         <p style="margin-top: 40px;" v-if="pasteToWin">We don't allow PASTE TO WIN...</p>
       </div>
     </div>
-  </template>
+    <Leaderboard :scores="leaderboardScores" />
+  </div>
+</template>
   
   <script setup>
     import { ref, computed } from 'vue';
+    import Leaderboard from '@/components/Leaderboard.vue';
     // Reference: ChatGPT4o was used to generate random data and simple code to house it for generating sentences.
     const nouns = [
       "cat", "dog", "car", "house", "tree", "computer", "book", "phone", "river", "mountain",
       "child", "teacher", "city", "ocean", "star", "bicycle", "flower", "shoe", "bird", "pencil"
     ];
+    const leaderboardScores = ref([
+    { name: 'Player 1', score: 50 },
+    { name: 'Player 2', score: 45 },
+    { name: 'Player 3', score: 40 },
+    { name: 'Player 4', score: 35 },
+    { name: 'Player 5', score: 30 },
+  ]);
 
     const verbs = [
       "run", "jump", "swim", "drive", "read", "write", "sing", "dance", "cook", "play",
@@ -234,17 +242,25 @@
 
 
 <style scoped>
-.typing-game {
-  max-width: 800px;
+.game-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  position: relative;
+}
+
+.typing-game {
+  flex: 0 1 auto;
+  max-width: 600px;
   text-align: center;
 }
 
 .game-area {
   margin-top: 20px;
 }
-
 
 .text-to-type {
   font-size: 1.2em;
@@ -268,10 +284,8 @@ button {
   0% {
     background-position: 0% 0%;
   }
-
   100% {
     background-position: 100% 100%;
-
   }
 }
 
@@ -284,7 +298,17 @@ button {
 
 .input {
   border: 2px solid yellow;
-  /* Example style for the class */
+}
+
+/* New styles for the leaderboard */
+:deep(.leaderboard) {
+  position: absolute;
+  right: 0;
+  top: 20px;
+  width: 250px;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 </style>
-
