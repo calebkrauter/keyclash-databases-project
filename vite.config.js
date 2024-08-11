@@ -10,9 +10,13 @@ export default defineConfig({
     }
   },
   server: {
-    port: 3000, // or any port you prefer for development
+    port: 5000,
     proxy: {
-      '/api': 'http://localhost:8080' // proxy API requests to your Express server
+      '/api': {
+        target: 'http://localhost:5001',
+        changeOrigin: true,
+        secure: false,
+      }
     }
   }
 })
