@@ -25,8 +25,10 @@
 </template>
 
 <script setup>
+import { useRoute, useRouter } from 'vue-router';
 import { ref } from 'vue';
 
+const router = useRouter();
 const name = ref('');
 const email = ref('');
 const password = ref('');
@@ -60,11 +62,14 @@ const handleRegister = async () => {
         password_hash: password.value
       }),
     });
-
+    console.log(({
+        username: name.value,
+        email: email.value,
+        password_hash: password.value
+      }));
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-
     const data = await response.json();
     console.log('User registered:', data);
     successMessage.value = 'Registration successful!';
@@ -77,6 +82,10 @@ const handleRegister = async () => {
     error.value = 'Registration failed. Please try again.';
   } finally {
     isLoading.value = false;
+    setTimeout(() => {
+      router.push('/');
+    }, 1000);
+    
   }
 };
 </script>
