@@ -64,13 +64,16 @@ const handleRegister = async () => {
       body: JSON.stringify({
         username: name.value,
         email: email.value,
-        password_hash: hashedPassword.value
+        //password_hash: hashedPassword.value
+        password_hash: password.value
       }),
     });
     console.log(({
         username: name.value,
         email: email.value,
-        password_hash: hashedPassword.value
+        //password_hash: hashedPassword.value
+        password_hash: password.value
+
       }));
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

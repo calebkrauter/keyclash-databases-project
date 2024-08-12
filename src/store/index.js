@@ -17,7 +17,7 @@ export const useAuthStore = defineStore('auth', () => {
       setTimeout(() => {
         isLoggedIn.value = true
         user.value = { name: credentials.email } // Set user data
-        verifyLogin();
+        // verifyLogin();
         resolve()
       }, 1000) // Simulating API delay
     })
