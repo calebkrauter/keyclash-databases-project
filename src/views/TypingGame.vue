@@ -103,9 +103,21 @@
     const gameStarted = ref(false);
     const roundsEnded = ref(true);
     const gameEnded = ref(false);
-    const pasteToWin = ref(false);
     const startTime = ref(0);
     const endTime = ref(0);
+    const API_URL = 'http://localhost:5001'; 
+    const pasteToWin = ref(false);
+    const playTenRounds = ref(false);
+    const highScoreOfDay = ref(false);
+    const firstScoreOfDay = ref(false);
+    const earlyBird = ref(false);
+    const highWPM = ref(false);
+    const slowPoke = ref(false);
+    const easterEgg = ref(false);
+    const perfectRun= ref(false);
+    const perfectionist = ref(false);
+    const username = ref('');
+
     let curWordIndex = 0;
     let curCharTextColor = "black";
     let pasteDoneOnce = false;
@@ -149,6 +161,7 @@
         }
       } else if (event.ctrlKey && event.key === "v") {
         pasteToWin.value = true;
+        handleAchievements();
         event.preventDefault();
       }
     }
@@ -202,6 +215,44 @@
     if (gameStarted.value) {
       gameStarted.value = false;
     }
+
+        const handleAchievements = async () => {
+          const achievements = {
+            paste_to_win: pasteToWin.value,
+            play_ten_rounds: playTenRounds.value,
+            high_score_of_day: highScoreOfDay.value,
+            first_score_of_day: firstScoreOfDay.value,
+            early_bird: earlyBird.value,
+            high_wpm: highWPM.value,
+            slow_poke: slowPoke.value,
+            easter_egg: easterEgg.value,
+            perfect_run: perfectRun.value,
+            perfectionist: perfectionist.value,
+            username: username.value,
+          }
+          try {
+          const response = await fetch(`${API_URL}/api/achievement`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          achievements
+        }),
+        });
+        console.log(({
+          achievements
+          }));
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      } catch (err) {
+        console.error('Achievement ERROR: ', err);
+        err.value = 'Achievement failed. Please try again.';
+      }
+        }
+      
+    
 
   </script>
 

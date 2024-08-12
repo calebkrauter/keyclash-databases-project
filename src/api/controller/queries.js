@@ -18,26 +18,16 @@ async function getLeaderboard() {
 }
 
 async function getUser(email, password_hash) {
-  console.log(password_hash);
   try {
     const sql = `
     SELECT email, password_hash FROM userinfo WHERE email = ? AND password_hash = ?`
-    const [rows] = await pool.query(sql, [email, password_hash]);
-    console.log("USER: " + rows);
+    const [result] = await pool.query(sql, [email, password_hash]);
+    console.log(result);
 
   } catch (err) {
     throw err + " User data does not match.";
   }
 }
-//
-//WHERE username = ${username} AND username = ${email} AND username = ${password_hash}
-// console.log("USER: " + JSON.stringify(await pool.query(sql, [email, password_hash])));
-// async function insertUser(username, email, password_hash) {
-//   const sql = `
-//     INSERT INTO userinfo (username, email, password_hash) 
-//     VALUES (?, ?, ?)
-//   `;
-// }
 async function getDailyLB() {
   const sql = `
     SELECT us.username, dl.top_daily_attempt, us.highscore
@@ -72,6 +62,27 @@ async function insertUser(username, email, password_hash) {
   }
 }
 
+async function insertAchievement(username) {
+  const sql = `
+    INSERT INTO achievements (paste_to_win, 
+    play_ten_rounds, high_score_of_day, 
+    first_score_of_day, early_bird, 
+    high_wpm, slow_poke, easter_egg, 
+    perfect_run, perfectionist, username) (? ? ? ? ? ? ? ? ? ?) WHERE username = ?;
+  `
+  const [result] = await pool.query(sql, [paste_to_win,
+    play_ten_rounds, high_score_of_day,
+    first_score_of_day, early_bird,
+    high_wpm, slow_poke, easter_egg,
+    perfect_run, perfectionist, username]);
+
+  // TODO add an alterAchievements function to
+  // update the achievements of a current player based on the true/false values
+  // in the their record.
+  // TODO Find a way to store the current user token.
+
+}
+
 async function insertAttempt(username, characters_attempted, characters_missed, wpm) {
   const sql = `
     INSERT INTO UserAttempts (username, characters_attempted, characters_missed, wpm) 
@@ -91,5 +102,6 @@ module.exports = {
   getLeaderboard,
   getDailyLB,
   insertUser,
-  insertAttempt
+  insertAttempt,
+
 };
