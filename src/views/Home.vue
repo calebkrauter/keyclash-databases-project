@@ -29,36 +29,36 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-const popOutText = ref(null)
-const router = useRouter()
+import { useRouter } from 'vue-router';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+const popOutText = ref(null);
+const router = useRouter();
 
 // Function to handle scroll event for pop-out text animation
 const handleScroll = () => {
-  const popOutTexts = document.querySelectorAll('.pop-out-text')
+  const popOutTexts = document.querySelectorAll('.pop-out-text');
 
   popOutTexts.forEach((element) => {
-    const position = element.getBoundingClientRect().top
-    const screenPosition = window.innerHeight / 1.1
+    const position = element.getBoundingClientRect().top;
+    const screenPosition = window.innerHeight / 1.1;
 
     if (position < screenPosition) {
-      element.classList.add('visible')
+      element.classList.add('visible');
     } else {
-      element.classList.remove('visible')
+      element.classList.remove('visible');
     }
   })
 }
 // Lifecycle hooks
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
+  window.addEventListener('scroll', handleScroll);
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('scroll', handleScroll);
 })
 const startGame = () => {
-  router.push('/game')
+  router.push('/game');
 }
 
 </script>
