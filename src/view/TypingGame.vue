@@ -1,6 +1,6 @@
 
 <template>
-
+  
     <div class="typing-game">
       <h1>Let The Battle Begin!</h1>
       <div class="game-area">

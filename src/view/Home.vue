@@ -1,10 +1,12 @@
 <template>
+  
   <div class="home">
     <!-- Welcome Section -->
     <section class="welcome-section">
       <div class="initial-content">
-        <h1 class="typing-animation">Welcome to KeyClash</h1>
-        <p class="typing-animation">
+        <h1 v-if= "authStore.isLoggedIn === false" class="typing-animation">Welcome to KeyClash</h1>
+        <h1 v-if= "authStore.isLoggedIn === true" class="typing-animation">Welcome {{ authStore.user }}</h1>
+        <p class="typing-animation">  
           <span class="hidden">Discover the ultimate typing challenge!</span>
         </p>
         <button @click="startGame" class="fade-in">Play Game</button>
@@ -31,9 +33,14 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useAuthStore } from '@/store';
+
 const popOutText = ref(null);
 const router = useRouter();
-
+const authStore = useAuthStore();
+const { isLoggedIn, username } = storeToRefs(authStore)
+const user = authStore.user
 // Function to handle scroll event for pop-out text animation
 const handleScroll = () => {
   const popOutTexts = document.querySelectorAll('.pop-out-text');
