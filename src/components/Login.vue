@@ -17,13 +17,43 @@
   
   <script setup>
   import { ref } from 'vue';
-  
+  import { useRouter } from 'vue-router';
+  const router = useRouter();
+  const name = ref('');
   const email = ref('');
   const password = ref('');
-  
-  const handleLogin = () => {
+  const API_URL = 'http://localhost:5001'; 
+
+  const handleLogin = async() => {
+
     // Implement your login logic here
+    // This console log is getting reached twice, is the post happening twice too?
+    
     console.log('Login attempt', { email: email.value, password: password.value });
+    try {
+      const response = await fetch(`${API_URL}/api/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email.value,
+        password_hash: password.value
+      })
+    });
+      if (!response.ok) {
+        throw new Error(response.status);
+      }
+    } catch (err) {
+      throw err
+    } 
+    finally {
+    setTimeout(() => {
+      router.push('/');
+      // This delay is added to reduce security vulnerabiltiy so all logins are consistent regardless of if data is retrieved.
+    }, 500)};
+  
+
   };
   </script>
   
