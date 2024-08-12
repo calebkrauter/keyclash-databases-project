@@ -2,7 +2,7 @@
 FROM node:20 AS build
 WORKDIR /app
 COPY package.json ./
-RUN npm ci
+RUN npm install
 COPY . .
 RUN npm run build
 
@@ -12,6 +12,6 @@ WORKDIR /app
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/package.json ./
 COPY --from=build /app/server.js ./
-RUN npm ci --only=production
-EXPOSE 8080
+RUN npm install --only=production
+ENV NODE_ENV=production
 CMD ["node", "server.js"]
