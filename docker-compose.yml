@@ -1,18 +1,16 @@
-
 services:
   vue-game:
     build:
       context: .
-      dockerfile: Dockerfile
-      args:
-        BUILDKIT_INLINE_CACHE: 1
-      cache_from:
-        - your-registry/your-vue-app:latest
+      dockerfile: Dockerfile.frontend
+      # args:
+      #   BUILDKIT_INLINE_CACHE: 1
+      # cache_from:
+      #   - your-registry/your-vue-app:latest
     container_name: vue-game-container
     ports:
-      - "8080:8080"
+      - "80:80"
     platform: linux/amd64
-  
 
 x-bake:
   target: vue-game

@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { insertUser, getUser } = require('./src/api/controller/queries');
+// const { insertUser, getUser } = require('./src/api/controller/queries');
 const app = express();
 const port = process.env.PORT || 5001;
 app.use(cors());
@@ -11,7 +11,7 @@ app.post('/api/login', async (req, res) => {
   try {
     const { email, password_hash } = req.body;
 
-    const result = await getUser(email, password_hash);
+    // const result = await getUser(email, password_hash);
 
     res.status(200).json({ message: 'Login successful', user: result });
 
@@ -31,7 +31,7 @@ app.post('/api/register', async (req, res) => {
   }
 
   try {
-    const result = await insertUser(username, email, password_hash);
+    // const result = await insertUser(username, email, password_hash);
     res.status(200).json({ message: 'Registration successful', user: result });
   } catch (error) {
     console.error('Registration error:', error);
