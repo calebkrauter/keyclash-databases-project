@@ -24,7 +24,7 @@
   const router = useRouter();
   const email = ref('');
   const password = ref('');
-  const API_URL = 'http://localhost:5001'; 
+  const API_URL = process.env.API_URL || 'http://localhost:5001'; 
   
   const authStore = useAuthStore();
   const {isLoggedIn, login} = storeToRefs(authStore)

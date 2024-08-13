@@ -105,7 +105,7 @@
     const gameEnded = ref(false);
     const startTime = ref(0);
     const endTime = ref(0);
-    const API_URL = 'http://localhost:5001'; 
+    const API_URL = process.env.API_URL || 'http://localhost:5001'; 
     const pasteToWin = ref(false);
     const playTenRounds = ref(false);
     const highScoreOfDay = ref(false);

@@ -40,7 +40,7 @@ const error = ref('');
 const successMessage = ref('');
 const isLoading = ref(false);
 
-const API_URL = 'http://localhost:5001'; 
+const API_URL = process.env.API_URL || 'http://localhost:5001'; 
 
 const handleRegister = async () => {
   error.value = '';
