@@ -1,4 +1,6 @@
 # Deploy by running sh ./deploy.sh
+# chmod +x deploy.sh
+#./deploy.sh
 #!/bin/bash
 echo Deploying KeyClash backend to ECS
 echo Attempting Login.

@@ -105,8 +105,8 @@
   }
   
   .btn-register {
-    background-color: #ffffff;
-    color: #D61F77;
+    background-color: transparent;
+    border: 2px solid #ffffff;
   }
   
   .btn-login {

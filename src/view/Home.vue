@@ -24,7 +24,20 @@
     <section id="meet-team" class="meet-team-section">
       <span class=meet-team-content>
         <h2 ref="popOutText" class="pop-out-text">Here we are!</h2>
+        <table>
+        <tr>
+          <th><a class="team" href="https://github.com/jasgcode">Johnny</a></th>
+        </tr>
+        <tr>
+          <th><a class="team" href="https://github.com/jimothy-dev">James</a></th>
+        </tr>
+        <tr>
+          <th><a class="team" href="https://github.com/calebkrauter">Caleb</a></th>
+        </tr>
+      </table>
       </span>
+      
+
 
     </section>
   </div>
@@ -281,5 +294,9 @@ button:hover {
 .pop-out-text.visible {
   transform: translateX(0);
   opacity: 1;
+}
+
+.team {
+  color: rgb(217, 0, 255);
 }
 </style>
