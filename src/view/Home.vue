@@ -17,6 +17,9 @@
     <section id="about-game" class="about-game-section">
       <span class=about-game-content>
         <h2 ref="popOutText" class="pop-out-text">What is KeyClash</h2>
+        <h4 ref="popOutText" class="pop-out-text">KeyClash is a typing game where you battle online for high rankings based on your WPM.
+          <br>Don't get too mad at our proprietary sentence genration, he's still in his infancy...
+          <br>He also likes to collect your data which you can view in your account stats.</h4>
       </span>
 
       <!-- Additional content for the about-game section can be added here -->
@@ -44,9 +47,8 @@ import Teamsection  from '@/components/Teamsection.vue';
 import { ref, onMounted, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useDataStore } from '@/store';
-
+const API_URL = 'http://localhost:5001';
 const userStore = useDataStore();
-const { countClicks, countKeyPresses } = storeToRefs(userStore);
 const { incrementClicks, incrementKeyPresses } = userStore;
 
 window.onclick = () => {

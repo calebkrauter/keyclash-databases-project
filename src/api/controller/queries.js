@@ -4,8 +4,8 @@ const pool = require('../config/db');
 async function getLeaderboard() {
   const sql = `
     SELECT us.username, hsr.ranking
-    FROM userscore us
-    JOIN highscoreranking hsr ON us.highscore 
+    FROM user_score us
+    JOIN highscore_ranking hsr ON us.highscore 
     BETWEEN hsr.highscore_range_start AND hsr.highscore_range_end
     ORDER BY us.highscore DESC;
   `;
@@ -22,19 +22,21 @@ async function getLeaderboard() {
 async function getUser(email, password_hash) {
   try {
     const sql = `
-      SELECT email, password_hash FROM userinfo WHERE email = ? AND password_hash = ?`
+      SELECT email, password_hash FROM user_info WHERE email = ? AND password_hash = ?`;
     const [result] = await pool.query(sql, [email, password_hash]);
     console.log(result);
-
+    return result;
   } catch (err) {
     throw err + " User data does not match.";
   }
 }
+
 async function getDailyLB() {
   const sql = `
-    SELECT us.username, dl.top_daily_attempt, us.highscore
-    FROM userscore us
-    JOIN dailyleaderboard dl ON us.username = dl.username
+    SELECT ui.username, dl.top_daily_attempt, us.highscore
+    FROM user_score us
+    JOIN daily_leaderboard dl ON us.user_id = dl.user_id
+    JOIN user_info ui ON us.user_id = ui.user_id
     ORDER BY us.highscore DESC, dl.top_daily_attempt DESC;
   `;
 
@@ -51,9 +53,10 @@ async function getAttempts(username) {
   const sql = `
     SELECT attempt_date, attempt_number, characters_attempted,
     characters_missed, wpm, accuracy_percentage
-    FROM userattempts
-    WHERE username = ?
-    ORDER BY attempt_number DESC;
+    FROM user_attempts
+    WHERE user_id = (SELECT user_id FROM user_info WHERE username = ?)
+    ORDER BY attempt_number DESC
+    LIMIT 5;
   `;
 
   try {
@@ -71,9 +74,10 @@ async function getAttempts(username) {
 //Function used to retrieve lifetime stats of certain user.
 async function getUserStats(username) {
   const sql = `
-    SELECT username, current_avg, total_attempts, highscore
-    FROM userscore
-    WHERE username = ?;
+    SELECT ui.username, us.current_avg, us.total_attempts, us.highscore
+    FROM user_score us
+    JOIN user_info ui ON us.user_id = ui.user_id
+    WHERE ui.username = ?;
   `;
 
   try {
@@ -95,11 +99,9 @@ async function getUserStats(username) {
 }
 
 // Function for registering new user and adding to DB.
-// Claude 3.5 Sonnet used to get format for database access
-// and error handeling.
 async function insertUser(username, email, password_hash) {
   const sql = `
-    INSERT INTO userinfo (username, email, password_hash) 
+    INSERT INTO user_info (username, email, password_hash) 
     VALUES (?, ?, ?);
   `;
 
@@ -115,38 +117,17 @@ async function insertUser(username, email, password_hash) {
   }
 }
 
-// TODO do this upon registration and alter upon achievement unlock.
-async function insertAchievement(username) {
-  const sql = `
-    INSERT INTO achievements (paste_to_win, 
-    play_ten_rounds, high_score_of_day, 
-    first_score_of_day, early_bird, 
-    high_wpm, slow_poke, easter_egg, 
-    perfect_run, perfectionist, username) 
-    VALUES (? ? ? ? ? ? ? ? ? ?) WHERE username = ?;
-  `
-  const [result] = await pool.query(sql, [paste_to_win,
-    play_ten_rounds, high_score_of_day,
-    first_score_of_day, early_bird,
-    high_wpm, slow_poke, easter_egg,
-    perfect_run, perfectionist, username]);
-
-  // TODO add an alterAchievements function to
-  // update the achievements of a current player based on the true/false values
-  // in the their record.
-  // TODO Find a way to store the current user token.
-
-}
-
 // Function to add an attempt by the user to the DB.
 async function insertAttempt(username, characters_attempted, characters_missed, wpm) {
   const sql = `
-    INSERT INTO UserAttempts (username, characters_attempted, characters_missed, wpm) 
-    VALUES (?, ?, ?, ?);
+    INSERT INTO user_attempts (user_id, characters_attempted, characters_missed, wpm) 
+    SELECT ui.user_id, ?, ?, ?
+    FROM user_info ui
+    WHERE ui.username = ?;
   `;
 
   try {
-    const [result] = await pool.query(sql, [username, characters_attempted, characters_missed, wpm]);
+    const [result] = await pool.query(sql, [characters_attempted, characters_missed, wpm, username]);
     return { id: result.insertId, username, wpm };
   } catch (err) {
     throw err;
@@ -156,17 +137,17 @@ async function insertAttempt(username, characters_attempted, characters_missed, 
 // Function to delete a user's account from the DB. Will cascade.
 async function deleteUser(username) {
   const sql = `
-    DELETE FROM userinfo
-    WHERE id = ?;
+    DELETE FROM user_info
+    WHERE username = ?;
   `;
 
   try {
-    console.log('Attempting to delete user with ID:', username);
+    console.log('Attempting to delete user:', username);
     const [rows] = await pool.query(sql, [username]);
     console.log('User deletion result:', rows);
 
     if (rows.affectedRows === 0) {
-      console.log('No user found with ID:', username);
+      console.log('No user found with username:', username);
       return { success: false, message: 'User not found' };
     }
 
