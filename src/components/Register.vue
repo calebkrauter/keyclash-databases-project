@@ -27,8 +27,22 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
 import { ref } from 'vue';
-// import bcrypt from 'bcryptjs';
+import { storeToRefs } from 'pinia';
+import { useDataStore } from '@/store';
 
+const userStore = useDataStore();
+const { countClicks, countKeyPresses, timeOfRegistration } = storeToRefs(userStore);
+const { incrementClicks, incrementKeyPresses, getTimeSinceRegister } = userStore;
+
+window.onclick = () => {
+  incrementClicks();
+  console.log(countClicks);
+}
+
+window.onkeydown = () => {
+  incrementKeyPresses();
+  console.log(countKeyPresses);
+}
 
 const router = useRouter();
 const name = ref('');
@@ -40,9 +54,11 @@ const error = ref('');
 const successMessage = ref('');
 const isLoading = ref(false);
 
-const API_URL = process.env.API_URL || 'http://localhost:5001'; 
+const API_URL = 'http://localhost:5001'; 
 
 const handleRegister = async () => {
+  
+
   error.value = '';
   successMessage.value = '';
 
@@ -56,6 +72,9 @@ const handleRegister = async () => {
   isLoading.value = true;
 
   try {
+    // const userStore = useDataStore();
+    // const { timeOfRegistration } = storeToRefs(userStore);
+    // const { getTimeSinceRegister } = userStore;
     const response = await fetch(`${API_URL}/api/register`, {
       method: 'POST',
       headers: {
@@ -86,6 +105,8 @@ const handleRegister = async () => {
     password.value = '';
     confirmPassword.value = '';
     hashedPassword.value = '';
+    getTimeSinceRegister();
+    console.log(timeOfRegistration);
   } catch (err) {
     console.error('Registration error:', err);
     error.value = 'Registration failed. Please try again.';

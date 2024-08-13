@@ -10,7 +10,7 @@
           <span class="hidden">Discover the ultimate typing challenge!</span>
         </p>
         <button @click="startGame" class="fade-in">Play Game</button>
-      </div>
+      </div>  
     </section>
 
     <!-- about-game Section -->
@@ -20,23 +20,17 @@
       </span>
 
       <!-- Additional content for the about-game section can be added here -->
+       <!-- Linkedin https://www.linkedin.com/in/calebkrauter/ -->
     </section>
-    <section id="meet-team" class="meet-team-section">
-      <span class=meet-team-content>
-        <h2 ref="popOutText" class="pop-out-text">Here we are!</h2>
-        <table>
-        <tr>
-          <th><a class="team" href="https://github.com/jasgcode">Johnny</a></th>
-        </tr>
-        <tr>
-          <th><a class="team" href="https://github.com/jimothy-dev">James</a></th>
-        </tr>
-        <tr>
-          <th><a class="team" href="https://github.com/calebkrauter">Caleb</a></th>
-        </tr>
-      </table>
-      </span>
-      
+     <section id="meet-team" class="meet-team-section" ref="teamSection">
+      <div class="curtain">
+        <div class="curtain-left"></div>
+        <div class="curtain-right"></div>
+      </div>
+      <div class="team-content">
+       <Teamsection />
+    
+      </div>
 
 
     </section>
@@ -45,19 +39,41 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { storeToRefs } from 'pinia';
 import { useAuthStore } from '@/store';
+import Teamsection  from '@/components/Teamsection.vue';  
+import { ref, onMounted, onUnmounted } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useDataStore } from '@/store';
 
-const popOutText = ref(null);
+const userStore = useDataStore();
+const { countClicks, countKeyPresses } = storeToRefs(userStore);
+const { incrementClicks, incrementKeyPresses } = userStore;
+
+window.onclick = () => {
+  incrementClicks();
+}
+
+window.onkeydown = () => {
+  incrementKeyPresses();
+}
 const router = useRouter();
 const authStore = useAuthStore();
-const { isLoggedIn, username } = storeToRefs(authStore)
-const user = authStore.user
-// Function to handle scroll event for pop-out text animation
+const { isLoggedIn, username } = storeToRefs(authStore);
+const user = authStore.user;
+const teamSection = ref(null);
+const popOutText = ref(null);
 const handleScroll = () => {
-  const popOutTexts = document.querySelectorAll('.pop-out-text');
+  if (teamSection.value) {
+    const rect = teamSection.value.getBoundingClientRect();
+    const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+    
+    if (isVisible) {
+      teamSection.value.classList.add('reveal');
+    }
+  }
 
+  // Existing pop-out text animation logic
+  const popOutTexts = document.querySelectorAll('.pop-out-text');
   popOutTexts.forEach((element) => {
     const position = element.getBoundingClientRect().top;
     const screenPosition = window.innerHeight / 1.1;
@@ -67,19 +83,23 @@ const handleScroll = () => {
     } else {
       element.classList.remove('visible');
     }
-  })
-}
-// Lifecycle hooks
-onMounted(() => {
-  window.addEventListener('scroll', handleScroll);
-})
+  });
+};
 
-onBeforeUnmount(() => {
-  window.removeEventListener('scroll', handleScroll);
-})
 const startGame = () => {
   router.push('/game');
-}
+};
+
+
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll);
+  handleScroll(); // Check visibility on initial load
+});
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll);
+});
 
 </script>
 
@@ -219,6 +239,52 @@ const startGame = () => {
   align-items: center;
   padding: 2rem;
   background-color: #f0f0f0;
+  position: relative;
+  overflow: hidden;
+}
+
+.curtain {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  z-index: 10;
+}
+
+.curtain-left, .curtain-right {
+  width: 50%;
+  height: 100%;
+  background-color: #333;
+  transition: transform 5s ease-out;
+}
+
+.curtain-left {
+  transform: translateX(0);
+}
+
+.curtain-right {
+  transform: translateX(0);
+}
+
+.reveal .curtain-left {
+  transform: translateX(-100%);
+}
+
+.reveal .curtain-right {
+  transform: translateX(100%);
+}
+
+.team-content {
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 2.5s ease-out 2.5s;
+}
+
+.reveal .team-content {
+  opacity: 1;
 }
 
 /* Typography Styles */

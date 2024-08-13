@@ -21,10 +21,22 @@
   import { useRouter } from 'vue-router';
   import { useAuthStore } from '@/store'; // Make sure this path is correct
   import { storeToRefs } from 'pinia';
+  import { useDataStore } from '@/store';
+
+  const userStore = useDataStore();
+  const { countClicks, countKeyPresses } = storeToRefs(userStore);
+  const { incrementClicks, incrementKeyPresses } = userStore;
+
+  window.onclick = () => {
+    incrementClicks();
+  }
+
+  window.onkeydown = () => {
+    incrementKeyPresses();
+  }
   const router = useRouter();
   const email = ref('');
   const password = ref('');
-  // const API_URL = process.env.API_URL || 'http://localhost:5001'; 
   const API_URL = 'http://localhost:5001';
   
   const authStore = useAuthStore();

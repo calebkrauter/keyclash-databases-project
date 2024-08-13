@@ -1,7 +1,52 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
+export const useDataStore = defineStore('userData', () => {
+
+  const countClicks = ref(0);
+  const countKeyPresses = ref(0);
+  const countWordsTyped = ref(0);
+  const countCharactersTyped = ref(0);
+  const countBackspaces = ref(0);
+  const timeOfRegistration = ref(null)
+
+  function incrementClicks() {
+    countClicks.value++;
+  }
+  function incrementKeyPresses() {
+    countKeyPresses.value++;
+  }
+  function incrementWordsTyped() {
+    countWordsTyped.value++;
+  }
+  function incrementCharactersTyped() {
+    countCharactersTyped.value++;
+  }
+  function incrementBackspaces() {
+    countBackspaces.value++;
+  }
+  function getTimeSinceRegister() {
+    timeOfRegistration.value = new Date().toISOString();
+  }
+  return {
+    countClicks,
+    countKeyPresses,
+    countWordsTyped,
+    countCharactersTyped,
+    countBackspaces,
+    timeOfRegistration,
+    incrementClicks,
+    incrementKeyPresses,
+    incrementWordsTyped,
+    incrementCharactersTyped,
+    incrementBackspaces,
+    getTimeSinceRegister
+  }
+})
+
 export const useAuthStore = defineStore('auth', () => {
+
+
   // State
   // const token = ref()
   const isLoggedIn = ref(false)

@@ -1,4 +1,3 @@
-
 <template>
   
     <div class="typing-game">
@@ -36,11 +35,27 @@
     import { ref, computed } from 'vue';
     // Reference: Claude AI and ChatGPT4o/3 were used to help with word generation and simple code to house it.
     // TODO ask AI if the word types are correct.
+    import { storeToRefs } from 'pinia';
+    import { useDataStore } from '@/store';
+
+    const userStore = useDataStore();
+    const { countClicks, countKeyPresses } = storeToRefs(userStore);
+    const { incrementClicks, incrementKeyPresses } = userStore;
+
+    window.onclick = () => {
+      incrementClicks();
+    }
+
+    window.onkeydown = () => {
+      incrementKeyPresses();
+    }
+
     const present = [
       ['a', 'the'],
       ['he', 'she', 'it'],
       ['walks', 'runs', 'jumps', 'sings', 'dances', 'plays', 'reads', 'writes', 'eats', 'drinks', 'sleeps', 'works', 'talks', 'listens', 'thinks', 'feels', 'sees', 'hears', 'smells', 'touches', 'learns', 'teaches', 'explores', 'discovers', 'imagines', 'wonders', 'hopes', 'dreams', 'believes'],
-      ['quickly', 'slowly', 'gracefully', 'happily', 'loudly', 'silently', 'easily', 'angrily', 'brightly', 'carefully', 'calmly', 'eagerly', 'sharply', 'quietly', 'gently', 'firmly', 'rapidly', 'smoothly', 'softly', 'boldly', 'secretly', 'roughly', 'cheerfully', 'awkwardly', 'nervously', 'constantly', 'rarely', 'frequently', 'suddenly', 'briefly', 'vividly', 'politely', 'warmly', 'gratefully', 'cautiously'],    ['fence', 'tree', 'ball', 'book', 'flower', 'tower', 'chair', 'car', 'cloud', 'river', 'mountain', 'house', 'sun', 'apple', 'desk', 'bird', 'moon', 'glass', 'cat', 'dog', 'pencil', 'table', 'window', 'door', 'street', 'clock', 'leaf', 'pond', 'butterfly', 'bicycle', 'computer', 'guitar', 'flower', 'hat'],    
+      ['quickly', 'slowly', 'gracefully', 'happily', 'loudly', 'silently', 'easily', 'angrily', 'brightly', 'carefully', 'calmly', 'eagerly', 'sharply', 'quietly', 'gently', 'firmly', 'rapidly', 'smoothly', 'softly', 'boldly', 'secretly', 'roughly', 'cheerfully', 'awkwardly', 'nervously', 'constantly', 'rarely', 'frequently', 'suddenly', 'briefly', 'vividly', 'politely', 'warmly', 'gratefully', 'cautiously'],    
+      ['fence', 'tree', 'ball', 'book', 'flower', 'tower', 'chair', 'car', 'cloud', 'river', 'mountain', 'house', 'sun', 'apple', 'desk', 'bird', 'moon', 'glass', 'cat', 'dog', 'pencil', 'table', 'window', 'door', 'street', 'clock', 'leaf', 'pond', 'butterfly', 'bicycle', 'computer', 'guitar', 'flower', 'hat'],    
       ['dog', 'cat', 'bird', 'person', 'child', 'woman', 'man', 'horse'],
       ["about","above","across","after","against","along","among","around","at","before","behind","below","beneath","beside","beyond","by","down","during","for","from","in","inside","into","like","near","off","on","onto","out","outside","over","through","to","toward","under","underneath","up","upon","with","within","without"],
       ["big", "small", "red", "blue", "green", "yellow", "tall", "short", "fast", "slow", "happy", "sad", "loud", "quiet", "soft", "hard", "new", "good", "bad", "beautiful", "ugly", "smart", "silly", "brave", "afraid", "strong", "weak", "warm", "cold", "dry", "wet", "rough", "smooth", "sharp", "dull", "heavy", "light", "narrow", "wide", "deep", "shallow", "bright", "dark", "clean", "dirty", "thin", "thick", "long", "short", "young", "modern", "cheap", "valuable", "worthless", "famous", "certain", "clear", "boring", "comfortable", "delicious", "disgusting", "dangerous", "safe"],
@@ -143,9 +158,21 @@
     }
     const keysPressedIterator = ref(0);
     let backspacePressed = false;
+
+
+
     function handleKeydown(event) {
+      const userStore = useDataStore();
+      const { countClicks, countKeyPresses, countWordsTyped, countCharactersTyped, countBackspaces} = storeToRefs(userStore);
+      const { incrementKeyPresses, incrementWordsTyped, incrementCharactersTyped, incrementBackspaces } = userStore;
+
+      incrementCharactersTyped();
+      console.log(countCharactersTyped);
       if (event.key === "Backspace" && event.key !== "Space") {
         if (userInput.value[keysPressedIterator.value-1] !== " ") {
+          incrementBackspaces();
+          console.log(countBackspaces);
+
           backspacePressed = true;
           keysPressedIterator.value = (userInput.value.split('')).length -1;
           if (keysPressedIterator.value < -1) {
@@ -158,6 +185,8 @@
         if (userInput.value[keysPressedIterator.value-1] === " " || userInput.value[keysPressedIterator.value-1] === undefined) {
           event.preventDefault();
         } else {
+          incrementWordsTyped();
+          console.log(countWordsTyped);
           curWordIndex++;
         }
       } else if (event.ctrlKey && event.key === "v") {
