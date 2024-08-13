@@ -27,11 +27,14 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
 import { ref } from 'vue';
+// import bcrypt from 'bcryptjs';
+
 
 const router = useRouter();
 const name = ref('');
 const email = ref('');
 const password = ref('');
+const hashedPassword = ref('');
 const confirmPassword = ref('');
 const error = ref('');
 const successMessage = ref('');
@@ -47,6 +50,8 @@ const handleRegister = async () => {
     error.value = 'Passwords do not match';
     return;
   }
+  
+  // const hashedPassword = await bcrypt.hash(password.value, 10);
 
   isLoading.value = true;
 
@@ -59,13 +64,16 @@ const handleRegister = async () => {
       body: JSON.stringify({
         username: name.value,
         email: email.value,
+        //password_hash: hashedPassword.value
         password_hash: password.value
       }),
     });
     console.log(({
         username: name.value,
         email: email.value,
+        //password_hash: hashedPassword.value
         password_hash: password.value
+
       }));
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -77,6 +85,7 @@ const handleRegister = async () => {
     email.value = '';
     password.value = '';
     confirmPassword.value = '';
+    hashedPassword.value = '';
   } catch (err) {
     console.error('Registration error:', err);
     error.value = 'Registration failed. Please try again.';
@@ -88,6 +97,7 @@ const handleRegister = async () => {
     
   }
 };
+
 </script>
 
 <style scoped>

@@ -1,5 +1,6 @@
+
 <template>
-  <div class="game-container">
+  
     <div class="typing-game">
       <h1>Let The Battle Begin!</h1>
       <div class="game-area">
@@ -13,6 +14,7 @@
           placeholder="Type here..."
           style="color: transparent"
         />
+        <!-- Reference for font from Google: https://fonts.google.com/selection/embed -->
         <p 
           id="userInput" 
           v-show="gameStarted"
@@ -28,104 +30,40 @@
         <p style="margin-top: 40px;" v-if="pasteToWin">We don't allow PASTE TO WIN...</p>
       </div>
     </div>
-    <Leaderboard :scores="leaderboardScores" />
-  </div>
-</template>
+  </template>
   
   <script setup>
     import { ref, computed } from 'vue';
-    import Leaderboard from '@/components/Leaderboard.vue';
-    // Reference: ChatGPT4o was used to generate random data and simple code to house it for generating sentences.
-    const nouns = [
-      "cat", "dog", "car", "house", "tree", "computer", "book", "phone", "river", "mountain",
-      "child", "teacher", "city", "ocean", "star", "bicycle", "flower", "shoe", "bird", "pencil"
+    // Reference: Claude AI and ChatGPT4o/3 were used to help with word generation and simple code to house it.
+    // TODO ask AI if the word types are correct.
+    const present = [
+      ['a', 'the'],
+      ['he', 'she', 'it'],
+      ['walks', 'runs', 'jumps', 'sings', 'dances', 'plays', 'reads', 'writes', 'eats', 'drinks', 'sleeps', 'works', 'talks', 'listens', 'thinks', 'feels', 'sees', 'hears', 'smells', 'touches', 'learns', 'teaches', 'explores', 'discovers', 'imagines', 'wonders', 'hopes', 'dreams', 'believes'],
+      ['quickly', 'slowly', 'gracefully', 'happily', 'loudly', 'silently', 'easily', 'angrily', 'brightly', 'carefully', 'calmly', 'eagerly', 'sharply', 'quietly', 'gently', 'firmly', 'rapidly', 'smoothly', 'softly', 'boldly', 'secretly', 'roughly', 'cheerfully', 'awkwardly', 'nervously', 'constantly', 'rarely', 'frequently', 'suddenly', 'briefly', 'vividly', 'politely', 'warmly', 'gratefully', 'cautiously'],    ['fence', 'tree', 'ball', 'book', 'flower', 'tower', 'chair', 'car', 'cloud', 'river', 'mountain', 'house', 'sun', 'apple', 'desk', 'bird', 'moon', 'glass', 'cat', 'dog', 'pencil', 'table', 'window', 'door', 'street', 'clock', 'leaf', 'pond', 'butterfly', 'bicycle', 'computer', 'guitar', 'flower', 'hat'],    
+      ['dog', 'cat', 'bird', 'person', 'child', 'woman', 'man', 'horse'],
+      ["about","above","across","after","against","along","among","around","at","before","behind","below","beneath","beside","beyond","by","down","during","for","from","in","inside","into","like","near","off","on","onto","out","outside","over","through","to","toward","under","underneath","up","upon","with","within","without"],
+      ["big", "small", "red", "blue", "green", "yellow", "tall", "short", "fast", "slow", "happy", "sad", "loud", "quiet", "soft", "hard", "new", "good", "bad", "beautiful", "ugly", "smart", "silly", "brave", "afraid", "strong", "weak", "warm", "cold", "dry", "wet", "rough", "smooth", "sharp", "dull", "heavy", "light", "narrow", "wide", "deep", "shallow", "bright", "dark", "clean", "dirty", "thin", "thick", "long", "short", "young", "modern", "cheap", "valuable", "worthless", "famous", "certain", "clear", "boring", "comfortable", "delicious", "disgusting", "dangerous", "safe"],
+      ['is', 'seems', 'becomes', 'appears', 'feels', 'looks', 'sounds', 'smells', 'tastes', 'remains', 'grows', 'stays', 'turns', 'sits', 'stands', 'falls', 'fades', 'shines', 'feels', 'moves', 'acts', 'sounds', 'becomes', 'feels', 'grows', 'appears', 'looks', 'remains', 'seems', 'turns', 'stays', 'feels', 'appears', 'sounds', 'turns'],
+      ['and', 'but', 'or'],
     ];
-    const leaderboardScores = ref([
-    { name: 'Player 1', score: 50 },
-    { name: 'Player 2', score: 45 },
-    { name: 'Player 3', score: 40 },
-    { name: 'Player 4', score: 35 },
-    { name: 'Player 5', score: 30 },
-  ]);
-
-    const verbs = [
-      "run", "jump", "swim", "drive", "read", "write", "sing", "dance", "cook", "play",
-      "study", "teach", "paint", "draw", "build", "fix", "throw", "catch", "fly", "climb"
-    ];
-
-    const adjectives = [
-      "happy", "sad", "bright", "dark", "tall", "short", "fast", "slow", "loud", "quiet",
-      "hot", "cold", "new", "old", "young", "strong", "weak", "smooth", "rough", "soft"
-    ];
-
-    const adverbs = [
-      "quickly", "slowly", "loudly", "quietly", "happily", "sadly", "gracefully", "clumsily", "brightly", "darkly",
-      "bravely", "cowardly", "calmly", "angrily", "easily", "hardly", "warmly", "coldly", "seriously", "jokingly"
-    ];
-
-    const pronouns = [
-      "he", "she", "it", "they", "we", "I", "you", "him", "her", "them",
-      "us", "me", "myself", "yourself", "himself", "herself", "itself", "ourselves", "yourselves", "themselves"
-    ];
-
-    const prepositions = [
-      "in", "on", "at", "by", "with", "about", "against", "between", "into", "through",
-      "during", "before", "after", "above", "below", "to", "from", "up", "down", "out"
-    ];
-
-    const conjunctions = [
-      "and", "but", "or", "so", "because", "although", "since", "if", "when", "while",
-      "where", "after", "before", "until", "unless", "whether", "though", "once", "than", "even though"
-    ];
-
-    const modals = [
-      "can", "could", "may", "might", "must", "shall", "should", "will", "would", "ought to",
-      "have to", "need to", "used to", "be able to", "be going to", "would like to", "shall", "will", "should", "might"
-    ];
-
-    const infinitives = [
-      "to run", "to jump", "to swim", "to drive", "to read", "to write", "to sing", "to dance", "to cook", "to play",
-      "to study", "to teach", "to paint", "to draw", "to build", "to fix", "to throw", "to catch", "to fly", "to climb"
-    ];
-
-    const gerunds = [
-      "running", "jumping", "swimming", "driving", "reading", "writing", "singing", "dancing", "cooking", "playing",
-      "studying", "teaching", "painting", "drawing", "building", "fixing", "throwing", "catching", "flying", "climbing"
-    ];
-    const items = [
-      "chair", "table", "lamp", "sofa", "bed", "desk", "cabinet", "television", "rug", "shelf",
-      "couch", "dresser", "stove", "microwave", "refrigerator", "toaster", "blender", "coffee maker", "oven", "bookshelf"
-    ];
-
-    const tenseWords = [
-      "present",    // e.g., "run"
-      "past",       // e.g., "ran"
-      "future",     // e.g., "will run"
-      "presentContinuous", // e.g., "running"
-      "pastContinuous",    // e.g., "was running"
-      "presentPerfect",    // e.g., "have run"
-      "pastPerfect",       // e.g., "had run"
-      "futureContinuous",  // e.g., "will be running"
-      "futurePerfect",     // e.g., "will have run"
-      "conditional"        // e.g., "would run"
-    ];
-    const tensePostfixes = [
-      "ing",        // Present Continuous, Gerunds
-      "ed",         // Past Simple
-      "s",          // Present Simple (third person singular)
-      "en",         // Past Participle (e.g., "written")
-      "will",       // Future Simple
-      "was/were",   // Past Continuous
-      "have/has",   // Present Perfect
-      "had",        // Past Perfect
-      "be",         // Future Continuous
-      "would"       // Conditional
-    ];
-
-    let chooseTense = Math.floor(Math.random() * (tenseWords.length - 0) + 0);
-    const wordIndexMax = 19;
-    const wordIndexMin = 0;
-    const multiplyer = (wordIndexMax - wordIndexMin) + wordIndexMin;
+    const wordType = {
+      article: 0,
+      person: 1,
+      verb: 2,
+      adverb: 3,
+      objectNoun: 4,
+      subject: 5,
+      preposition: 6,
+      adjective: 7,
+      linkingVerb: 8,
+      conjunction: 9,
+    }
+  
+    const sentence = [
+      [wordType.article, wordType.subject, wordType.adverb, wordType.verb, wordType.preposition, wordType.article, wordType.adjective, wordType.objectNoun],
+      [wordType.person, wordType.verb, wordType.adverb, wordType.conjunction, wordType.linkingVerb, wordType.article, wordType.adjective, wordType.objectNoun],
+    ]
     const space = " ";
     const period = ".";
     const texts = [];
@@ -165,9 +103,21 @@
     const gameStarted = ref(false);
     const roundsEnded = ref(true);
     const gameEnded = ref(false);
-    const pasteToWin = ref(false);
     const startTime = ref(0);
     const endTime = ref(0);
+    const API_URL = 'http://localhost:5001'; 
+    const pasteToWin = ref(false);
+    const playTenRounds = ref(false);
+    const highScoreOfDay = ref(false);
+    const firstScoreOfDay = ref(false);
+    const earlyBird = ref(false);
+    const highWPM = ref(false);
+    const slowPoke = ref(false);
+    const easterEgg = ref(false);
+    const perfectRun= ref(false);
+    const perfectionist = ref(false);
+    const username = ref('');
+
     let curWordIndex = 0;
     let curCharTextColor = "black";
     let pasteDoneOnce = false;
@@ -211,6 +161,7 @@
         }
       } else if (event.ctrlKey && event.key === "v") {
         pasteToWin.value = true;
+        handleAchievements();
         event.preventDefault();
       }
     }
@@ -265,29 +216,59 @@
       gameStarted.value = false;
     }
 
+        const handleAchievements = async () => {
+          const achievements = {
+            paste_to_win: pasteToWin.value,
+            play_ten_rounds: playTenRounds.value,
+            high_score_of_day: highScoreOfDay.value,
+            first_score_of_day: firstScoreOfDay.value,
+            early_bird: earlyBird.value,
+            high_wpm: highWPM.value,
+            slow_poke: slowPoke.value,
+            easter_egg: easterEgg.value,
+            perfect_run: perfectRun.value,
+            perfectionist: perfectionist.value,
+            username: username.value,
+          }
+          try {
+          const response = await fetch(`${API_URL}/api/achievement`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          achievements
+        }),
+        });
+        console.log(({
+          achievements
+          }));
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      } catch (err) {
+        console.error('Achievement ERROR: ', err);
+        err.value = 'Achievement failed. Please try again.';
+      }
+        }
+      
+    
+
   </script>
 
 
 <style scoped>
-.game-container {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  max-width: 1200px;
+.typing-game {
+  max-width: 800px;
   margin: 0 auto;
   padding: 20px;
-  position: relative;
-}
-
-.typing-game {
-  flex: 0 1 auto;
-  max-width: 600px;
   text-align: center;
 }
 
 .game-area {
   margin-top: 20px;
 }
+
 
 .text-to-type {
   font-size: 1.2em;
@@ -311,8 +292,10 @@ button {
   0% {
     background-position: 0% 0%;
   }
+
   100% {
     background-position: 100% 100%;
+
   }
 }
 
@@ -325,17 +308,7 @@ button {
 
 .input {
   border: 2px solid yellow;
-}
-
-/* New styles for the leaderboard */
-:deep(.leaderboard) {
-  position: absolute;
-  right: 0;
-  top: 20px;
-  width: 250px;
-  background-color: rgba(255, 255, 255, 0.8);
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  /* Example style for the class */
 }
 </style>
+

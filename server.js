@@ -3,7 +3,6 @@ const cors = require('cors');
 const { insertUser, getUser } = require('./src/api/controller/queries');
 const app = express();
 const port = process.env.PORT || 5001;
-console.log("App started.")
 app.use(cors());
 app.use(express.json());
 
@@ -44,3 +43,13 @@ app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
+app.post('/api/achievement', async (req, res) => {
+  console.log("It's alive!");
+  res.status(200).json({ message: 'Achievement successful' });
+});
+
+module.exports = {
+  express,
+  app,
+  port,
+}
