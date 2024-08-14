@@ -26,18 +26,22 @@
 
       </span>
     </section>
-    <section id="meet-team" class="meet-team-section" ref="teamSection">
-      <div class="curtain">
-        <div class="curtain-left"></div>
-        <div class="curtain-right"></div>
+    <div class="meet-team-wrapper">
+    <div class="background-animation">
+      <div v-for="n in 20" :key="`circle-${n}`" class="circle"></div>
+      <div v-for="(key, index) in keys" :key="`key-${index}`" class="key" :style="key.style">
+        {{ key.letter }}
       </div>
-      <div class="team-content">
-        <Teamsection />
-
+      <div v-for="(word, index) in words" :key="`word-${index}`" class="word" :class="{ 'typing': word.isTyping }" :style="word.style">
+        <span v-for="(letter, letterIndex) in word.text" :key="`letter-${letterIndex}`" 
+              :class="{ 'typed': letterIndex < word.typedLength }">
+          {{ letter }}
+        </span>
       </div>
+    </div>
+    <Teamsection />
+  </div>
 
-
-    </section>
   </div>
 </template>
 
@@ -108,6 +112,50 @@ const startTypingAnimation = (element, delay = 0) => {
     }, delay);
   }
 };
+const randomLetter = () => {
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  return letters[Math.floor(Math.random() * letters.length)];
+};
+
+const createFloatingElement = () => ({
+  left: `${Math.random() * 100}%`,
+  top: `${Math.random() * 100}%`,
+  animationDelay: `${Math.random() * 5}s`,
+  animationDuration: `${Math.random() * 20 + 40}s`
+});
+
+const keys = ref(Array.from({ length: 15 }, () => ({
+  letter: randomLetter(),
+  style: createFloatingElement()
+})));
+
+const wordList = ['TYPE', 'FAST', 'GAME', 'SKILL', 'SPEED', 'LEARN', 'IMPROVE', 'PRACTICE', 'CHALLENGE', 'KEYBOARD'];
+
+const words = ref(wordList.map((word) => ({
+  text: word,
+  isTyping: false,
+  typedLength: 0,
+  style: createFloatingElement()
+})));
+
+const typeWord = (index) => {
+  const word = words.value[index];
+  word.isTyping = true;
+  word.typedLength = 0;
+  
+  const typeInterval = setInterval(() => {
+    if (word.typedLength < word.text.length) {
+      word.typedLength++;
+    } else {
+      clearInterval(typeInterval);
+      setTimeout(() => {
+        word.isTyping = false;
+        word.typedLength = 0;
+        setTimeout(() => typeWord(index), Math.random() * 5000 + 2000);
+      }, 1000);
+    }
+  }, 100);
+};
 const startGame = () => {
   router.push('/game');
 };
@@ -119,6 +167,9 @@ onMounted(() => {
   handleScroll(); // Check visibility on initial load
   startTypingAnimation(aboutTitle, 500);
   startTypingAnimation(aboutDescription, 2000);
+  words.value.forEach((_, index) => {
+    setTimeout(() => typeWord(index), Math.random() * 5000);
+  });
 });
 
 onUnmounted(() => {
@@ -296,61 +347,104 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.meet-team-section {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem;
-  background-color: #f0f0f0;
+.meet-team-wrapper {
   position: relative;
   overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
 }
 
-.curtain {
+.background-animation {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  display: flex;
-  z-index: 10;
-}
-
-.curtain-left,
-.curtain-right {
-  width: 50%;
-  height: 100%;
-  background-color: #333;
-  transition: transform 5s ease-out;
-}
-
-.curtain-left {
-  transform: translateX(0);
-}
-
-.curtain-right {
-  transform: translateX(0);
-}
-
-.reveal .curtain-left {
-  transform: translateX(-100%);
-}
-
-.reveal .curtain-right {
-  transform: translateX(100%);
-}
-
-.team-content {
-  position: relative;
   z-index: 1;
-  opacity: 0;
-  transition: opacity 2.5s ease-out 2.5s;
 }
 
-.reveal .team-content {
+.circle {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  animation: floatFull 60s infinite ease-in-out;
+}
+
+.key {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  animation: floatFull 60s infinite ease-in-out;
+}
+
+.word {
+  position: absolute;
+  font-size: 24px;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.3);
+  animation: floatFull 60s infinite ease-in-out;
+}
+
+.word.typing {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.word span {
+  opacity: 0.3;
+  transition: opacity 0.1s;
+}
+
+.word span.typed {
   opacity: 1;
+}
+
+@keyframes floatFull {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  20% { transform: translate(100%, 50%) rotate(60deg); }
+  40% { transform: translate(50%, 100%) rotate(-60deg); }
+  60% { transform: translate(-50%, 50%) rotate(30deg); }
+  80% { transform: translate(25%, -50%) rotate(-30deg); }
+}
+
+.key:nth-child(21) { left: 10%; top: 15%; animation-delay: -1s; }
+.key:nth-child(22) { left: 25%; top: 35%; animation-delay: -3s; }
+.key:nth-child(23) { left: 40%; top: 55%; animation-delay: -5s; }
+.key:nth-child(24) { left: 55%; top: 75%; animation-delay: -7s; }
+.key:nth-child(25) { left: 70%; top: 25%; animation-delay: -2s; }
+.key:nth-child(26) { left: 85%; top: 45%; animation-delay: -4s; }
+.key:nth-child(27) { left: 20%; top: 65%; animation-delay: -6s; }
+.key:nth-child(28) { left: 35%; top: 85%; animation-delay: -8s; }
+.key:nth-child(29) { left: 50%; top: 5%; animation-delay: -1s; }
+.key:nth-child(30) { left: 65%; top: 95%; animation-delay: -3s; }
+.key:nth-child(31) { left: 80%; top: 15%; animation-delay: -5s; }
+.key:nth-child(32) { left: 95%; top: 35%; animation-delay: -7s; }
+.key:nth-child(33) { left: 5%; top: 55%; animation-delay: -2s; }
+.key:nth-child(34) { left: 30%; top: 75%; animation-delay: -4s; }
+.key:nth-child(35) { left: 45%; top: 25%; animation-delay: -6s; }
+
+/* Position words */
+.word:nth-child(36) { left: 5%; top: 85%; animation-delay: -1s; }
+.word:nth-child(37) { left: 25%; top: 15%; animation-delay: -3s; }
+.word:nth-child(38) { left: 45%; top: 45%; animation-delay: -5s; }
+.word:nth-child(39) { left: 65%; top: 75%; animation-delay: -7s; }
+.word:nth-child(40) { left: 85%; top: 5%; animation-delay: -2s; }
+.word:nth-child(41) { left: 15%; top: 35%; animation-delay: -4s; }
+.word:nth-child(42) { left: 35%; top: 65%; animation-delay: -6s; }
+.word:nth-child(43) { left: 55%; top: 95%; animation-delay: -8s; }
+.word:nth-child(44) { left: 75%; top: 25%; animation-delay: -1s; }
+.word:nth-child(45) { left: 95%; top: 55%; animation-delay: -3s; }
+
+/* Ensure Teamsection is above the background */
+:deep(.meet-team-section) {
+  position: relative;
+  z-index: 2;
+  background: transparent;
 }
 
 /* Typography Styles */

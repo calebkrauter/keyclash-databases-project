@@ -8,10 +8,10 @@
         </div>
         <h3>{{ member.name }}</h3>
         <div class="social-links">
-          <a :href="member.github" target="_blank" rel="noopener noreferrer">
+          <a :href="member.github" target="_blank" rel="noopener noreferrer" :aria-label="`${member.name}'s GitHub`">
             <i class="fab fa-github"></i>
           </a>
-          <a :href="member.linkedin" target="_blank" rel="noopener noreferrer">
+          <a :href="member.linkedin" target="_blank" rel="noopener noreferrer" :aria-label="`${member.name}'s LinkedIn`">
             <i class="fab fa-linkedin"></i>
           </a>
         </div>
@@ -24,21 +24,21 @@
 import { ref } from 'vue';
 
 const teamMembers = ref([
- {
+  {
     name: 'James',
-    image: 'src/public/JamesAndMiki.jpg',
+    image: '/src/public/JamesAndMiki.jpg',
     github: 'https://github.com/jimothy-dev',
     linkedin: 'https://www.linkedin.com/in/james'
   },
   {
     name: 'Johnny',
-    image: 'src/public/Johnny.jpg',
+    image: '/src/public/Johnny.jpg',
     github: 'https://github.com/jasgcode',
     linkedin: 'https://www.linkedin.com/in/jasgarnica'
   },
   {
     name: 'Caleb',
-    image: 'src/public/caleb.jpg',
+    image: '/src/public/caleb.jpg',
     github: 'https://github.com/calebkrauter',
     linkedin: 'https://www.linkedin.com/in/calebkrauter/'
   }
@@ -53,7 +53,7 @@ const teamMembers = ref([
   justify-content: center;
   align-items: center;
   padding: 2rem;
-  background-color: #f0f0f0;
+  background-color: transparent;  /* Changed to transparent to show background animation */
 }
 
 .team-members {
@@ -67,6 +67,11 @@ const teamMembers = ref([
 .team-member {
   width: 200px;
   text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.team-member:hover {
+  transform: translateY(-5px);
 }
 
 .member-image {
@@ -75,6 +80,12 @@ const teamMembers = ref([
   border-radius: 50%;
   overflow: hidden;
   margin: 0 auto 1rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.member-image:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 .member-image img {
@@ -92,9 +103,14 @@ const teamMembers = ref([
   font-size: 1.5rem;
   margin: 0 0.5rem;
   text-decoration: none;
+  transition: color 0.3s ease, transform 0.3s ease;
 }
 
-/* Reuse your existing pop-out text animation */
+.social-links a:hover {
+  color: #007bff;
+  transform: translateY(-3px);
+}
+
 .pop-out-text {
   transform: translateX(-100%);
   opacity: 0;
@@ -104,5 +120,11 @@ const teamMembers = ref([
 .pop-out-text.visible {
   transform: translateX(0);
   opacity: 1;
+}
+
+/* Add this to ensure text is readable over the animated background */
+h2, h3 {
+  color: #fff;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
 }
 </style>
