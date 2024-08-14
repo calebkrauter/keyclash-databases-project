@@ -15,17 +15,20 @@
 
     <!-- about-game Section -->
     <section id="about-game" class="about-game-section">
-      <div class="animated-background"></div>
-      <span class="about-game-content">
-        <h2 ref="aboutTitle" class="typing-text">What is KeyClash</h2>
-        <h4 ref="aboutDescription" class="typing-text">
-          KeyClash is a typing game where you battle online for high rankings based on your WPM.
-          <br>Don't get too mad at our proprietary sentence generation, he's still in his infancy...
-          <br>He also likes to collect your data which you can view in your account stats.
-        </h4>
-
-      </span>
-    </section>
+    <div class="typing-background">
+      <div v-for="key in keyParticles" :key="key.id" class="key-particle" :style="key.style">
+        {{ key.letter }}
+      </div>
+    </div>
+    <span class="about-game-content">
+      <h2 ref="aboutTitle" class="typing-text">What is KeyClash</h2>
+      <h4 ref="aboutDescription" class="typing-text">
+        KeyClash is a typing game where you battle online for high rankings based on your WPM.
+        <br>Don't get too mad at our proprietary sentence generation, he's still in his infancy...
+        <br>He also likes to collect your data which you can view in your account stats.
+      </h4>
+    </span>
+  </section>
     <div class="meet-team-wrapper">
     <div class="background-animation">
       <div v-for="n in 20" :key="`circle-${n}`" class="circle"></div>
@@ -94,7 +97,23 @@ const handleScroll = () => {
 };
 const aboutTitle = ref(null);
 const aboutDescription = ref(null);
+const keyParticles = ref([]);
 
+const generateKeyParticles = () => {
+  const keys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+  for (let i = 0; i < 50; i++) {
+    keyParticles.value.push({
+      id: i,
+      letter: keys[Math.floor(Math.random() * keys.length)],
+      style: {
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `-${Math.random() * 3000}ms`,
+        animationDuration: `${Math.random() * 2000 + 3000}ms`,
+      }
+    });
+  }
+};
 const startTypingAnimation = (element, delay = 0) => {
   if (element.value) {
     const text = element.value.textContent;
@@ -167,6 +186,7 @@ onMounted(() => {
   handleScroll(); // Check visibility on initial load
   startTypingAnimation(aboutTitle, 500);
   startTypingAnimation(aboutDescription, 2000);
+  generateKeyParticles();
   words.value.forEach((_, index) => {
     setTimeout(() => typeWord(index), Math.random() * 5000);
   });
@@ -296,6 +316,7 @@ onUnmounted(() => {
 }
 
 /* about-game Section Styles */
+
 .about-game-section {
   min-height: 100vh;
   display: flex;
@@ -308,29 +329,49 @@ onUnmounted(() => {
   color: white;
 }
 
-.animated-background {
+.typing-background {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(45deg, #3498db, #8e44ad, #3498db);
-  background-size: 400% 400%;
-  animation: gradientAnimation 15s ease infinite;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  overflow: hidden;
   z-index: -1;
 }
 
-@keyframes gradientAnimation {
+.key-particle {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  animation: keyPress 5s infinite;
+  user-select: none;
+}
+
+@keyframes keyPress {
   0% {
-    background-position: 0% 50%;
+    transform: translateY(0) scale(1);
+    opacity: 0;
   }
-
-  50% {
-    background-position: 100% 50%;
+  10% {
+    transform: translateY(-10px) scale(1.1);
+    opacity: 1;
   }
-
+  90% {
+    transform: translateY(-100px) scale(0.9);
+    opacity: 1;
+  }
   100% {
-    background-position: 0% 50%;
+    transform: translateY(-120px) scale(0.8);
+    opacity: 0;
   }
 }
 
@@ -340,13 +381,13 @@ onUnmounted(() => {
   border-radius: 10px;
   max-width: 800px;
   width: 90%;
+  z-index: 1;
 }
 
 .typing-text {
   white-space: pre-wrap;
   overflow: hidden;
 }
-
 .meet-team-wrapper {
   position: relative;
   overflow: hidden;
