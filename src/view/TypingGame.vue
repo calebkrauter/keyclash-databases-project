@@ -9,7 +9,8 @@
         }}</span> <span>{{
               currentText[curWordIndex + 1] }}</span></p>
         <input v-model="userInput" v-show="gameStarted" @input="checkInput" @keydown="handleKeydown" ref="inputField"
-          :disabled="!gameStarted || gameEnded" placeholder="Type here..." style="color: transparent" />
+          :disabled="!gameStarted || gameEnded" placeholder="Type here..."
+          style=" cursor: not-allowed; color: transparent;" />
         <!-- Reference for font from Google: https://fonts.google.com/selection/embed -->
         <p id="userInput" v-show="gameStarted" @keydown="handleKeydown" :style="inputTextStyle" style="margin-top: -55px;
           font-family: Righteous, sans-serif;
@@ -178,6 +179,10 @@ document.addEventListener('keydown', (event) => {
       startRound();
     }
   }
+  // Also won't work.
+  // if (event.ctrlKey) {
+  //   event.preventDefault;
+  // }
 })
 function handleKeydown(event) {
   const userStore = useDataStore();
