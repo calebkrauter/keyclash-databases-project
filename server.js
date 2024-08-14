@@ -58,6 +58,16 @@ app.listen(port, () => {
 //   res.status(200).json({ message: 'Achievement successful' });
 // });
 
+app.get('/api/leaderboard', async (req, res) => {
+  try {
+    const result = await getLeaderboard();
+    res.status(200).json(result.data);
+  } catch (error) {
+    console.error('Leaderboard error:', error);
+    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+  }
+});
+
 module.exports = {
   express,
   app,
