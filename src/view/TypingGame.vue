@@ -4,7 +4,10 @@
     <div class="typing-game">
       <h1>Let The Battle Begin!</h1>
       <div class="game-area">
-        <p class="text-to-type">{{ currentText }}</p>
+        <p v-if="gameStarted && !gameEnded" class="text-to-type"><span style="color: purple;">{{
+          currentText[curWordIndex]
+        }}</span> <span>{{
+              currentText[curWordIndex + 1] }}</span></p>
         <input v-model="userInput" v-show="gameStarted" @input="checkInput" @keydown="handleKeydown" ref="inputField"
           :disabled="!gameStarted || gameEnded" placeholder="Type here..." style="color: transparent" />
         <!-- Reference for font from Google: https://fonts.google.com/selection/embed -->
@@ -151,7 +154,8 @@ function startRound() {
   attemptedCharacters += texts[curRound.value].length;
 
   roundsEnded.value = false;
-  currentText.value = texts[curRound.value];
+  currentText.value = texts[curRound.value].split(' ');
+  currentText.value
   userInput.value = '';
   userInputConstrained.value = '';
   gameStarted.value = true;
@@ -244,10 +248,10 @@ function checkInput() {
   // let userInputWords = userInputChar.split(' ');
   let curWord = userInput.value.split(' ');
   userInputConstrained.value = curWord[curWordIndex];
-  let charsToType = currentText.value.split('');
-  let inputChar = userInputChar[keysPressedIterator.value];
+  // let charsToType = currentText.value.split('');
+  // let inputChar = userInputChar[keysPressedIterator.value];
   // check current index of current word typed vs expected.
-  validArrayGiven = currentText.value.split(' ');
+  validArrayGiven = currentText.value;
   typedArray = userInput.value.split(' ');
   if (backspacePressed) {
     charIndexOfWord--;
@@ -266,7 +270,7 @@ function checkInput() {
   // TODO make this work without a try/catch... Validation feedback is not always accurate when backspacing.
   sentenceFeedback();
 
-  if (curWordIndex >= currentText.value.split(' ').length) {
+  if (curWordIndex >= currentText.value.length) {
 
     completeUserInputText.value += userInput.value;
     completeText.value += texts[curRound.value] + space;
