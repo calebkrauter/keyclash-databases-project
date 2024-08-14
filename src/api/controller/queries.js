@@ -3,11 +3,12 @@ const pool = require('../config/db');
 // Function to display all users with ranks.
 async function getLeaderboard() {
   const sql = `
-    SELECT us.username, hsr.ranking
+    SELECT ui.username, us.highscore, hsr.ranking
     FROM user_score us
+    JOIN user_info ui ON us.user_id = ui.user_id
     JOIN highscore_ranking hsr ON us.highscore 
     BETWEEN hsr.highscore_range_start AND hsr.highscore_range_end
-    ORDER BY us.highscore DESC;
+    ORDER BY us.highscore DESC, ui.username ASC;
   `;
 
   try {
@@ -22,7 +23,10 @@ async function getLeaderboard() {
 async function getUser(email, password_hash) {
   try {
     const sql = `
-      SELECT email, password_hash FROM user_info WHERE email = ? AND password_hash = ?`;
+      SELECT email, password_hash 
+      FROM user_info 
+      WHERE email = ? AND password_hash = ?
+    `;
     const [result] = await pool.query(sql, [email, password_hash]);
     console.log(result);
     return result;

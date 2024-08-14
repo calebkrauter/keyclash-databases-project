@@ -1,38 +1,39 @@
 <template>
-  
+
   <div class="home">
     <!-- Welcome Section -->
     <section class="welcome-section">
       <div class="initial-content">
-        <h1 v-if= "authStore.isLoggedIn === false" class="typing-animation">Welcome to KeyClash</h1>
-        <h1 v-if= "authStore.isLoggedIn === true" class="typing-animation">Welcome {{ authStore.user }}</h1>
-        <p class="typing-animation">  
+        <h1 v-if="authStore.isLoggedIn === false" class="typing-animation">Welcome to KeyClash</h1>
+        <h1 v-if="authStore.isLoggedIn === true" class="typing-animation">Welcome {{ authStore.user }}</h1>
+        <p class="typing-animation">
           <span class="hidden">Discover the ultimate typing challenge!</span>
         </p>
         <button @click="startGame" class="fade-in">Play Game</button>
-      </div>  
+      </div>
     </section>
 
     <!-- about-game Section -->
     <section id="about-game" class="about-game-section">
-      <span class=about-game-content>
-        <h2 ref="popOutText" class="pop-out-text">What is KeyClash</h2>
-        <h4 ref="popOutText" class="pop-out-text">KeyClash is a typing game where you battle online for high rankings based on your WPM.
-          <br>Don't get too mad at our proprietary sentence genration, he's still in his infancy...
-          <br>He also likes to collect your data which you can view in your account stats.</h4>
-      </span>
+      <div class="animated-background"></div>
+      <span class="about-game-content">
+        <h2 ref="aboutTitle" class="typing-text">What is KeyClash</h2>
+        <h4 ref="aboutDescription" class="typing-text">
+          KeyClash is a typing game where you battle online for high rankings based on your WPM.
+          <br>Don't get too mad at our proprietary sentence generation, he's still in his infancy...
+          <br>He also likes to collect your data which you can view in your account stats.
+        </h4>
 
-      <!-- Additional content for the about-game section can be added here -->
-       <!-- Linkedin https://www.linkedin.com/in/calebkrauter/ -->
+      </span>
     </section>
-     <section id="meet-team" class="meet-team-section" ref="teamSection">
+    <section id="meet-team" class="meet-team-section" ref="teamSection">
       <div class="curtain">
         <div class="curtain-left"></div>
         <div class="curtain-right"></div>
       </div>
       <div class="team-content">
-       <Teamsection />
-    
+        <Teamsection />
+
       </div>
 
 
@@ -43,7 +44,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/store';
-import Teamsection  from '@/components/Teamsection.vue';  
+import Teamsection from '@/components/Teamsection.vue';
 import { ref, onMounted, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useDataStore } from '@/store';
@@ -68,7 +69,7 @@ const handleScroll = () => {
   if (teamSection.value) {
     const rect = teamSection.value.getBoundingClientRect();
     const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
-    
+
     if (isVisible) {
       teamSection.value.classList.add('reveal');
     }
@@ -87,7 +88,26 @@ const handleScroll = () => {
     }
   });
 };
+const aboutTitle = ref(null);
+const aboutDescription = ref(null);
 
+const startTypingAnimation = (element, delay = 0) => {
+  if (element.value) {
+    const text = element.value.textContent;
+    element.value.textContent = '';
+    let i = 0;
+    setTimeout(() => {
+      const interval = setInterval(() => {
+        if (i < text.length) {
+          element.value.textContent += text.charAt(i);
+          i++;
+        } else {
+          clearInterval(interval);
+        }
+      }, 50); // Adjust typing speed here
+    }, delay);
+  }
+};
 const startGame = () => {
   router.push('/game');
 };
@@ -97,6 +117,8 @@ const startGame = () => {
 onMounted(() => {
   window.addEventListener('scroll', handleScroll);
   handleScroll(); // Check visibility on initial load
+  startTypingAnimation(aboutTitle, 500);
+  startTypingAnimation(aboutDescription, 2000);
 });
 
 onUnmounted(() => {
@@ -230,7 +252,48 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   padding: 2rem;
-  background-color: #f0f0f0;
+  position: relative;
+  overflow: hidden;
+  color: white;
+}
+
+.animated-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, #3498db, #8e44ad, #3498db);
+  background-size: 400% 400%;
+  animation: gradientAnimation 15s ease infinite;
+  z-index: -1;
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.about-game-content {
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 2rem;
+  border-radius: 10px;
+  max-width: 800px;
+  width: 90%;
+}
+
+.typing-text {
+  white-space: pre-wrap;
+  overflow: hidden;
 }
 
 .meet-team-section {
@@ -255,7 +318,8 @@ onUnmounted(() => {
   z-index: 10;
 }
 
-.curtain-left, .curtain-right {
+.curtain-left,
+.curtain-right {
   width: 50%;
   height: 100%;
   background-color: #333;
