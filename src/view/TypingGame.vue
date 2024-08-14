@@ -161,6 +161,7 @@ function startGame() {
 }
 const keysPressedIterator = ref(0);
 let backspacePressed = false;
+let shiftPressed = false
 let numOfWrongChars = 0;
 
 
@@ -170,33 +171,52 @@ function handleKeydown(event) {
   const { countClicks, countKeyPresses, countWordsTyped, countCharactersTyped, countBackspaces } = storeToRefs(userStore);
   const { incrementKeyPresses, incrementWordsTyped, incrementCharactersTyped, incrementBackspaces } = userStore;
 
-  incrementCharactersTyped();
+  if (event.key !== "Shift") {
+    incrementCharactersTyped();
+    shiftPressed = false;
+  } else {
+    shiftPressed = true;
+  }
   // console.log(countCharactersTyped);
+
   if (event.key === "Backspace" && event.key !== "Space") {
     if (userInput.value[keysPressedIterator.value - 1] !== " ") {
       incrementBackspaces();
       // console.log(countBackspaces);
-
+      // console.log((userInput.value.split('')).length - 1)
+      // charIndexOfWord = (userInput.value.split('')).length - 1;
       backspacePressed = true;
+      sentenceFeedback();
       keysPressedIterator.value = (userInput.value.split('')).length - 1;
       if (keysPressedIterator.value < -1) {
         keysPressedIterator.value = 0;
+
       }
     } else {
       event.preventDefault();
     }
   } else if (event.key === " ") {
     if (userInput.value[keysPressedIterator.value - 1] === " " || userInput.value[keysPressedIterator.value - 1] === undefined) {
+      // charIndexOfWord = -1;
       event.preventDefault();
     } else {
       incrementWordsTyped();
       // console.log(countWordsTyped);
       curWordIndex++;
+      charIndexOfWord = -1;
+
     }
   } else if (event.ctrlKey && event.key === "v") {
     pasteToWin.value = true;
     handleAchievements();
     event.preventDefault();
+  }
+  // Doesn't work...
+  // else if (event.ctrlKey && event.key === "Backspace") {
+  //   event.preventDefault();
+  // } 
+  else if (event.key !== "Shift") {
+    charIndexOfWord++;
   }
 }
 
@@ -206,19 +226,36 @@ const inputTextStyle = computed(() => {
     color: curKey[keysPressedIterator.value - 1] ? curCharTextColor : "black",
   };
 });
-
+let validArrayGiven = [];
+let typedArray = [];
+let charIndexOfWord = -1;
 function checkInput() {
 
   let userInputChar = userInput.value.split('');
+  // let userInputWords = userInputChar.split(' ');
   let curWord = userInput.value.split(' ');
   userInputConstrained.value = curWord[curWordIndex];
-  let charsToType = currentText.value.split('')
-  let inputChar = userInputChar[keysPressedIterator.value]
-  if (inputChar === charsToType[keysPressedIterator.value]) {
-    curCharTextColor = "green";
-  } else {
-    curCharTextColor = "red";
+  let charsToType = currentText.value.split('');
+  let inputChar = userInputChar[keysPressedIterator.value];
+  // check current index of current word typed vs expected.
+  validArrayGiven = currentText.value.split(' ');
+  typedArray = userInput.value.split(' ');
+  if (backspacePressed) {
+    charIndexOfWord--;
   }
+  // console.log(validArrayGiven);
+  // console.log(typedArray[curWordIndex])
+  // console.log(validArrayGiven[curWordIndex])
+  // console.log(charIndexOfWord)
+  // console.log(typedArray[curWordIndex].split('')[charIndexOfWord])
+  // console.log(validArrayGiven[curWordIndex].split('')[charIndexOfWord])
+  // console.log(charIndexOfWord)
+  // if (charIndexOfWord <= 0) {
+  //   charIndexOfWord = 0;
+  // }
+  // console.log(charIndexOfWord)
+  // TODO make this work without a try/catch... Validation feedback is not always accurate when backspacing.
+  sentenceFeedback();
 
   if (curWordIndex >= currentText.value.split(' ').length) {
 
@@ -231,6 +268,7 @@ function checkInput() {
     console.log(wordsTypedArray);
 
     curRound.value++;
+
     if (curRound.value >= roundsToPlay) {
       for (let n = 0; n < wordsGivenArray.length; n++) {
         let curGivenWordLength = wordsGivenArray[n].split('').length;
@@ -254,6 +292,7 @@ function checkInput() {
       pasteDoneOnce = false;
       gameStarted.value = false;
       roundsEnded.value = true;
+
     } else {
       curWordIndex = 0;
       keysPressedIterator.value = -1;
@@ -261,16 +300,30 @@ function checkInput() {
     }
   }
   if (!backspacePressed) {
-    keysPressedIterator.value++;
+    if (!shiftPressed) {
+      keysPressedIterator.value++;
+    }
   } else {
     keysPressedIterator.value = userInputChar.length;
+    charIndexOfWord = curWord[curWordIndex].length - 1;
     backspacePressed = false;
   }
   if (userInputChar.length <= 0) {
     keysPressedIterator.value = 0;
+    // charIndexOfWord = -1;
   }
 }
+function sentenceFeedback() {
+  try {
+    if (typedArray[curWordIndex].split('')[charIndexOfWord] === validArrayGiven[curWordIndex].split('')[charIndexOfWord]) {
+      curCharTextColor = "green";
+    } else {
+      curCharTextColor = "red";
+    }
+  } catch (error) {
 
+  }
+}
 if (gameStarted.value) {
   gameStarted.value = false;
 }
