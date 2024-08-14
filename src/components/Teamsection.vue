@@ -28,7 +28,7 @@ const teamMembers = ref([
     name: 'James',
     image: '/src/public/JamesAndMiki.jpg',
     github: 'https://github.com/jimothy-dev',
-    linkedin: 'https://www.linkedin.com/in/james'
+    linkedin: 'https://www.linkedin.com/in/jamessimpson012'
   },
   {
     name: 'Johnny',
@@ -40,7 +40,7 @@ const teamMembers = ref([
     name: 'Caleb',
     image: '/src/public/caleb.jpg',
     github: 'https://github.com/calebkrauter',
-    linkedin: 'https://www.linkedin.com/in/calebkrauter/'
+    linkedin: 'https://www.linkedin.com/in/calebkrauter'
   }
 ]);
 </script>
