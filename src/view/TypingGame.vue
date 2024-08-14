@@ -6,7 +6,7 @@
       <div class="game-area">
         <p v-if="gameStarted && !gameEnded" class="text-to-type"><span style="color: purple;">{{
           currentText[curWordIndex]
-        }}</span> <span>{{
+            }}</span> <span>{{
               currentText[curWordIndex + 1] }}</span></p>
         <input v-model="userInput" v-show="gameStarted" @input="checkInput" @keydown="handleKeydown" ref="inputField"
           :disabled="!gameStarted || gameEnded" placeholder="Type here..."
@@ -166,8 +166,8 @@ async function saveAttempt(characters_attempted, characters_missed, wpm) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        characters_attempted: attemptedCharacters,
-        characters_missed: numOfWrongChars,
+        characters_attempted: characters_attempted,
+        characters_missed: characters_missed,
         wpm,
         email: authStore.user
       })
@@ -335,8 +335,8 @@ function checkInput() {
         }
       }
       console.log("Number of incorrect characters typed = " + numOfWrongChars);
-
       endTime.value = Date.now();
+      // saveAttempt(attemptedCharacters, numOfWrongChars, wmp);
       gameEnded.value = true;
       curWordIndex = 0;
       curRound.value = 0;

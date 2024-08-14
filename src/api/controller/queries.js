@@ -146,7 +146,7 @@ async function insertAttempt(email, characters_attempted, characters_missed, wpm
   `;
 
   try {
-    const user_id = await getUserIdByEmail(email);
+    const user_id = getUserIdByEmail(email);
 
     const [result] = await pool.query(insertAttemptSQL, [user_id, characters_attempted, characters_missed, wpm]);
 
@@ -155,12 +155,16 @@ async function insertAttempt(email, characters_attempted, characters_missed, wpm
         SELECT attempt_number
         FROM user_attempts
         WHERE user_id = ?
-        ORDER BY [user_id]
-      `
-    )
+        ORDER BY attempt_number DESC
+        LIMIT 1
+      `,
+      [user_id]
+    );
+
     return {
       id: result.insertId,
       email,
+      attempt_number: attemptDetails[0].attempt_number,
       wpm,
       characters_attempted,
       characters_missed
