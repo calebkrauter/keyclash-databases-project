@@ -1,9 +1,8 @@
 const express = require('express');
 const cors = require('cors');
-const { insertUser, getUser } = require('./src/api/controller/queries');
+const { insertUser, getUser, getLeaderboard } = require('./src/api/controller/queries');
 const app = express();
 const port = process.env.PORT || 5001;
-console.log("App started.")
 app.use(cors());
 app.use(express.json());
 
@@ -21,6 +20,16 @@ app.post('/api/login', async (req, res) => {
     throw err + " can't login."
   }
 
+});
+
+app.get('/api/leaderboard', async (req, res) => {
+  try {
+    const result = await getLeaderboard();
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Leaderboard error:", err);
+    res.status(500).json({ error: "Can't fetch leaderboard. " + err.message });
+  }
 });
 
 app.post('/api/register', async (req, res) => {
@@ -44,3 +53,13 @@ app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
+// app.post('/api/achievement', async (req, res) => {
+//   console.log("It's alive!");
+//   res.status(200).json({ message: 'Achievement successful' });
+// });
+
+module.exports = {
+  express,
+  app,
+  port,
+}
