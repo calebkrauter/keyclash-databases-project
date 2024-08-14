@@ -81,7 +81,7 @@ const sentence = [
 ]
 const space = " ";
 const period = ".";
-const texts = [];
+let texts = [];
 const roundsToPlay = 3;
 const curRound = ref(0);
 
@@ -338,6 +338,7 @@ function checkInput() {
       endTime.value = Date.now();
       // saveAttempt(attemptedCharacters, numOfWrongChars, wmp);
       gameEnded.value = true;
+      texts = [];
       curWordIndex = 0;
       curRound.value = 0;
       keysPressedIterator.value = -1;
