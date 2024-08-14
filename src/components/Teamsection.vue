@@ -11,7 +11,8 @@
           <a :href="member.github" target="_blank" rel="noopener noreferrer" :aria-label="`${member.name}'s GitHub`">
             <i class="fab fa-github"></i>
           </a>
-          <a :href="member.linkedin" target="_blank" rel="noopener noreferrer" :aria-label="`${member.name}'s LinkedIn`">
+          <a :href="member.linkedin" target="_blank" rel="noopener noreferrer"
+            :aria-label="`${member.name}'s LinkedIn`">
             <i class="fab fa-linkedin"></i>
           </a>
         </div>
@@ -26,19 +27,19 @@ import { ref } from 'vue';
 const teamMembers = ref([
   {
     name: 'James Simpson',
-    image: '/src/public/JamesAndMiki.jpg',
+    image: 'https://i.imgur.com/cFywBRN.jpg',
     github: 'https://github.com/jimothy-dev',
     linkedin: 'https://www.linkedin.com/in/jamessimpson012'
   },
   {
     name: 'John Garnica',
-    image: '/src/public/Johnny.jpg',
+    image: 'https://i.imgur.com/0hLyqMU.jpg',
     github: 'https://github.com/jasgcode',
     linkedin: 'https://www.linkedin.com/in/jasgarnica'
   },
   {
     name: 'Caleb Krauter',
-    image: '/src/public/caleb.jpg',
+    image: 'https://i.imgur.com/1imVThy.jpg',
     github: 'https://github.com/calebkrauter',
     linkedin: 'https://www.linkedin.com/in/calebkrauter'
   }
@@ -53,7 +54,8 @@ const teamMembers = ref([
   justify-content: center;
   align-items: center;
   padding: 2rem;
-  background-color: transparent;  /* Changed to transparent to show background animation */
+  background-color: transparent;
+  /* Changed to transparent to show background animation */
 }
 
 .team-members {
@@ -85,7 +87,7 @@ const teamMembers = ref([
 
 .member-image:hover {
   transform: scale(1.05);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .member-image img {
@@ -123,8 +125,9 @@ const teamMembers = ref([
 }
 
 /* Add this to ensure text is readable over the animated background */
-h2, h3 {
+h2,
+h3 {
   color: #fff;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 }
 </style>

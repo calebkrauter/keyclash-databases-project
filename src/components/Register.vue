@@ -28,9 +28,12 @@
 import { useRoute, useRouter } from 'vue-router';
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useDataStore } from '@/store';
+import { useDataStore, useAuthStore } from '@/store';
 
 const userStore = useDataStore();
+
+const authStore = useAuthStore();
+const { isLoggedIn, login } = storeToRefs(authStore)
 const { countClicks, countKeyPresses, timeOfRegistration } = storeToRefs(userStore);
 const { incrementClicks, incrementKeyPresses, getTimeSinceRegister } = userStore;
 
@@ -54,10 +57,10 @@ const error = ref('');
 const successMessage = ref('');
 const isLoading = ref(false);
 
-const API_URL = 'http://localhost:5001'; 
+const API_URL = 'http://localhost:5001';
 
 const handleRegister = async () => {
-  
+
 
   error.value = '';
   successMessage.value = '';
@@ -66,7 +69,7 @@ const handleRegister = async () => {
     error.value = 'Passwords do not match';
     return;
   }
-  
+
   // const hashedPassword = await bcrypt.hash(password.value, 10);
 
   isLoading.value = true;
@@ -88,12 +91,12 @@ const handleRegister = async () => {
       }),
     });
     console.log(({
-        username: name.value,
-        email: email.value,
-        //password_hash: hashedPassword.value
-        password_hash: password.value
+      username: name.value,
+      email: email.value,
+      //password_hash: hashedPassword.value
+      password_hash: password.value
 
-      }));
+    }));
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -111,11 +114,12 @@ const handleRegister = async () => {
     console.error('Registration error:', err);
     error.value = 'Registration failed. Please try again.';
   } finally {
+    await authStore.login({ email: email.value });
     isLoading.value = false;
     setTimeout(() => {
       router.push('/');
     }, 1000);
-    
+
   }
 };
 

@@ -49,15 +49,26 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
-
 // app.post('/api/achievement', async (req, res) => {
 //   console.log("It's alive!");
 //   res.status(200).json({ message: 'Achievement successful' });
 // });
 
+app.post('/api/attempt', async (req, res) => {
+  try {
+    const { characters_attempted, characters_missed, wpm, email } = req.body;
+    // const getUserId = await getUserId(email);
+    const result = await insertAttempt(email, characters_attempted, characters_missed, wpm);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Attempt insertion error:", err);
+    res.status(500).json({ error: "Can't insert attempt. " + err.message });
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
 module.exports = {
   express,
   app,

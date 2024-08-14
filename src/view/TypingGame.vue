@@ -32,12 +32,15 @@ import { ref, watch, nextTick, computed, onMounted } from 'vue';
 // Reference: Claude AI and ChatGPT4o/3 were used to help with word generation and simple code to house it.
 // TODO ask AI if the word types are correct.
 import { storeToRefs } from 'pinia';
-import { useDataStore } from '@/store';
+import { useDataStore, useAuthStore } from '@/store';
 import Leaderboard from '../components/Leaderboard.vue';
 
 const userStore = useDataStore();
 const { countClicks, countKeyPresses } = storeToRefs(userStore);
 const { incrementClicks, incrementKeyPresses } = userStore;
+
+const authStore = useAuthStore();
+const { isLoggedIn, login } = storeToRefs(authStore)
 
 window.onclick = () => {
   incrementClicks();
@@ -134,9 +137,14 @@ const inputField = ref(null);
 let curWordIndex = 0;
 let curCharTextColor = "black";
 let pasteDoneOnce = false;
-let attemptedCharacters = 0;
 let wordsTypedArray = [];
 let wordsGivenArray = [];
+const keysPressedIterator = ref(0);
+let backspacePressed = false;
+let shiftPressed = false
+let attemptedCharacters = 0;
+let numOfWrongChars = 0;
+
 
 const wpm = computed(() => {
   if (!gameEnded.value && !roundsEnded) return 0;
@@ -145,6 +153,36 @@ const wpm = computed(() => {
 
   return Math.round(wordsTyped / timeInMinutes);
 });
+
+async function saveAttempt(characters_attempted, characters_missed, wpm) {
+  if (!authStore.isLoggedIn) {
+    console.log('User not logged in. Attempt not saved.');
+    return;
+  }
+  try {
+    const response = await fetch(`${API_URL}/api/attempt`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        characters_attempted: attemptedCharacters,
+        characters_missed: numOfWrongChars,
+        wpm,
+        email: authStore.user
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('Attempt saved:', result);
+  } catch (err) {
+    console.error('Failed to save attempt:', err);
+  }
+}
 
 function startRound() {
   if (curRound.value === 0) {
@@ -162,10 +200,7 @@ function startRound() {
   gameStarted.value = true;
   gameEnded.value = false;
 }
-const keysPressedIterator = ref(0);
-let backspacePressed = false;
-let shiftPressed = false
-let numOfWrongChars = 0;
+
 
 watch(gameStarted, () => {
   nextTick(() => {

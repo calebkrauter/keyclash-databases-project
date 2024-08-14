@@ -121,19 +121,52 @@ async function insertUser(username, email, password_hash) {
   }
 }
 
+async function getUserIdByEmail(email) {
+  const sql = 'SELECT user_id FROM user_info WHERE email = ?';
+
+  try {
+    const [rows] = await pool.query(sql, [email]);
+
+    if (rows.length === 0) {
+      throw new Error('User not found');
+    }
+
+    return rows[0].user_id;
+  } catch (err) {
+    console.error('Error in getUserIdByEmail:', err);
+    throw err;
+  }
+}
+
 // Function to add an attempt by the user to the DB.
-async function insertAttempt(username, characters_attempted, characters_missed, wpm) {
-  const sql = `
+async function insertAttempt(email, characters_attempted, characters_missed, wpm) {
+  const insertAttemptSQL = `
     INSERT INTO user_attempts (user_id, characters_attempted, characters_missed, wpm) 
-    SELECT ui.user_id, ?, ?, ?
-    FROM user_info ui
-    WHERE ui.username = ?;
+    VALUES (?, ?, ?, ?)  
   `;
 
   try {
-    const [result] = await pool.query(sql, [characters_attempted, characters_missed, wpm, username]);
-    return { id: result.insertId, username, wpm };
+    const user_id = await getUserIdByEmail(email);
+
+    const [result] = await pool.query(insertAttemptSQL, [user_id, characters_attempted, characters_missed, wpm]);
+
+    const [attemptDetails] = await pool.query(
+      `
+        SELECT attempt_number
+        FROM user_attempts
+        WHERE user_id = ?
+        ORDER BY [user_id]
+      `
+    )
+    return {
+      id: result.insertId,
+      email,
+      wpm,
+      characters_attempted,
+      characters_missed
+    };
   } catch (err) {
+    console.error('Error in insertAttempt:', err);
     throw err;
   }
 }
