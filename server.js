@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { insertUser, getUser, getLeaderboard } = require('./src/api/controller/queries');
+const { insertUser, getUser, getLeaderboard, getUserIdByEmail, insertAttempt } = require('./src/api/controller/queries');
 const app = express();
 const port = process.env.PORT || 5001;
 app.use(cors());
@@ -57,8 +57,9 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/attempt', async (req, res) => {
   try {
     const { characters_attempted, characters_missed, wpm, email } = req.body;
-    // const getUserId = await getUserId(email);
-    const result = await insertAttempt(email, characters_attempted, characters_missed, wpm);
+    // console.log({ characters_attempted, characters_missed, wpm, email })
+    const getUserId = await getUserIdByEmail(email);
+    const result = insertAttempt(getUserId, characters_attempted, characters_missed, wpm);
     res.status(200).json(result);
   } catch (err) {
     console.error("Attempt insertion error:", err);

@@ -6,7 +6,7 @@
       <div class="game-area">
         <p v-if="gameStarted && !gameEnded" class="text-to-type"><span style="color: purple;">{{
           currentText[curWordIndex]
-            }}</span> <span>{{
+        }}</span> <span>{{
               currentText[curWordIndex + 1] }}</span></p>
         <input v-model="userInput" v-show="gameStarted" @input="checkInput" @keydown="handleKeydown" ref="inputField"
           :disabled="!gameStarted || gameEnded" placeholder="Type here..."
@@ -134,6 +134,8 @@ const username = ref('');
 const completeUserInputText = ref('');
 const completeText = ref('');
 const inputField = ref(null);
+const attemptedCharacters = ref(0);
+const numOfWrongChars = ref(0);
 let curWordIndex = 0;
 let curCharTextColor = "black";
 let pasteDoneOnce = false;
@@ -142,8 +144,6 @@ let wordsGivenArray = [];
 const keysPressedIterator = ref(0);
 let backspacePressed = false;
 let shiftPressed = false
-let attemptedCharacters = 0;
-let numOfWrongChars = 0;
 
 
 const wpm = computed(() => {
@@ -154,35 +154,7 @@ const wpm = computed(() => {
   return Math.round(wordsTyped / timeInMinutes);
 });
 
-async function saveAttempt(characters_attempted, characters_missed, wpm) {
-  if (!authStore.isLoggedIn) {
-    console.log('User not logged in. Attempt not saved.');
-    return;
-  }
-  try {
-    const response = await fetch(`${API_URL}/api/attempt`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        characters_attempted: characters_attempted,
-        characters_missed: characters_missed,
-        wpm,
-        email: authStore.user
-      })
-    });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    console.log('Attempt saved:', result);
-  } catch (err) {
-    console.error('Failed to save attempt:', err);
-  }
-}
 
 function startRound() {
   if (curRound.value === 0) {
@@ -190,7 +162,7 @@ function startRound() {
   }
   texts.push(generateSentence());
 
-  attemptedCharacters += texts[curRound.value].length;
+  attemptedCharacters.value += texts[curRound.value].length;
 
   roundsEnded.value = false;
   currentText.value = texts[curRound.value].split(' ');
@@ -329,14 +301,14 @@ function checkInput() {
         let longestCurWordLength = curGivenWordLength >= curTypedWordLength ? curGivenWordLength : curTypedWordLength;
         for (let m = 0; m < longestCurWordLength; m++) {
           if (wordsGivenArray[n].split('')[m] !== wordsTypedArray[n].split('')[m]) {
-            numOfWrongChars++;
+            numOfWrongChars.value++;
           }
 
         }
       }
-      console.log("Number of incorrect characters typed = " + numOfWrongChars);
+      console.log("Number of incorrect characters typed = " + numOfWrongChars.value);
       endTime.value = Date.now();
-      // saveAttempt(attemptedCharacters, numOfWrongChars, wmp);
+      saveAttempt();
       gameEnded.value = true;
       texts = [];
       curWordIndex = 0;
@@ -376,6 +348,42 @@ function sentenceFeedback() {
     }
   } catch (error) {
 
+  }
+}
+const curWPM = ref(wpm);
+async function saveAttempt() {
+  if (!authStore.isLoggedIn) {
+    console.log('User not logged in. Attempt not saved.');
+    return;
+  }
+  try {
+    const response = await fetch(`${API_URL}/api/attempt`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        characters_attempted: attemptedCharacters.value,
+        characters_missed: numOfWrongChars.value,
+        wpm: curWPM.value,
+        email: authStore.user.name
+      })
+    });
+    console.log(({
+      characters_attempted: attemptedCharacters.value,
+      characters_missed: numOfWrongChars.value,
+      wpm: curWPM.value,
+      email: authStore.user.name
+    }))
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('Attempt saved:', result);
+  } catch (err) {
+    console.error('Failed to save attempt:', err);
   }
 }
 if (gameStarted.value) {

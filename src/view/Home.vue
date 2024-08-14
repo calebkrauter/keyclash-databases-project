@@ -5,7 +5,7 @@
     <section class="welcome-section">
       <div class="initial-content">
         <h1 v-if="authStore.isLoggedIn === false" class="typing-animation">Welcome to KeyClash</h1>
-        <h1 v-if="authStore.isLoggedIn === true" class="typing-animation">Welcome {{ authStore.user }}</h1>
+        <h1 v-if="authStore.isLoggedIn === true" class="typing-animation">Welcome {{ authStore.user.name }}</h1>
         <p class="typing-animation">
           <span class="hidden">Discover the ultimate typing challenge!</span>
         </p>
@@ -15,35 +15,36 @@
 
     <!-- about-game Section -->
     <section id="about-game" class="about-game-section">
-    <div class="typing-background">
-      <div v-for="key in keyParticles" :key="key.id" class="key-particle" :style="key.style">
-        {{ key.letter }}
+      <div class="typing-background">
+        <div v-for="key in keyParticles" :key="key.id" class="key-particle" :style="key.style">
+          {{ key.letter }}
+        </div>
       </div>
-    </div>
-    <span class="about-game-content">
-      <h2 ref="aboutTitle" class="typing-text">What is KeyClash</h2>
-      <h4 ref="aboutDescription" class="typing-text">
-        KeyClash is a typing game where you battle online for high rankings based on your WPM.
-        <br>Don't get too mad at our proprietary sentence generation, he's still in his infancy...
-        <br>He also likes to collect your data which you can view in your account stats.
-      </h4>
-    </span>
-  </section>
+      <span class="about-game-content">
+        <h2 ref="aboutTitle" class="typing-text">What is KeyClash</h2>
+        <h4 ref="aboutDescription" class="typing-text">
+          KeyClash is a typing game where you battle online for high rankings based on your WPM.
+          <br>Don't get too mad at our proprietary sentence generation, he's still in his infancy...
+          <br>He also likes to collect your data which you can view in your account stats.
+        </h4>
+      </span>
+    </section>
     <div class="meet-team-wrapper">
-    <div class="background-animation">
-      <div v-for="n in 20" :key="`circle-${n}`" class="circle"></div>
-      <div v-for="(key, index) in keys" :key="`key-${index}`" class="key" :style="key.style">
-        {{ key.letter }}
+      <div class="background-animation">
+        <div v-for="n in 20" :key="`circle-${n}`" class="circle"></div>
+        <div v-for="(key, index) in keys" :key="`key-${index}`" class="key" :style="key.style">
+          {{ key.letter }}
+        </div>
+        <div v-for="(word, index) in words" :key="`word-${index}`" class="word" :class="{ 'typing': word.isTyping }"
+          :style="word.style">
+          <span v-for="(letter, letterIndex) in word.text" :key="`letter-${letterIndex}`"
+            :class="{ 'typed': letterIndex < word.typedLength }">
+            {{ letter }}
+          </span>
+        </div>
       </div>
-      <div v-for="(word, index) in words" :key="`word-${index}`" class="word" :class="{ 'typing': word.isTyping }" :style="word.style">
-        <span v-for="(letter, letterIndex) in word.text" :key="`letter-${letterIndex}`" 
-              :class="{ 'typed': letterIndex < word.typedLength }">
-          {{ letter }}
-        </span>
-      </div>
+      <Teamsection />
     </div>
-    <Teamsection />
-  </div>
 
   </div>
 </template>
@@ -115,21 +116,22 @@ const generateKeyParticles = () => {
   }
 };
 const startTypingAnimation = (element, delay = 0) => {
-  if (element.value) {
-    const text = element.value.textContent;
-    element.value.textContent = '';
-    let i = 0;
-    setTimeout(() => {
-      const interval = setInterval(() => {
-        if (i < text.length) {
-          element.value.textContent += text.charAt(i);
-          i++;
-        } else {
-          clearInterval(interval);
-        }
-      }, 50); // Adjust typing speed here
-    }, delay);
-  }
+  // TEMPORARILY COMMENTED OUT DUE TO ERROR
+  // if (element.value) {
+  //   const text = element.value.textContent;
+  //   element.value.textContent = '';
+  //   let i = 0;
+  //   setTimeout(() => {
+  //     const interval = setInterval(() => {
+  //       if (i < text.length) {
+  //         element.value.textContent += text.charAt(i);
+  //         i++;
+  //       } else {
+  //         clearInterval(interval);
+  //       }
+  //     }, 50); // Adjust typing speed here
+  //   }, delay);
+  // }
 };
 const randomLetter = () => {
   const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -161,7 +163,7 @@ const typeWord = (index) => {
   const word = words.value[index];
   word.isTyping = true;
   word.typedLength = 0;
-  
+
   const typeInterval = setInterval(() => {
     if (word.typedLength < word.text.length) {
       word.typedLength++;
@@ -361,14 +363,17 @@ onUnmounted(() => {
     transform: translateY(0) scale(1);
     opacity: 0;
   }
+
   10% {
     transform: translateY(-10px) scale(1.1);
     opacity: 1;
   }
+
   90% {
     transform: translateY(-100px) scale(0.9);
     opacity: 1;
   }
+
   100% {
     transform: translateY(-120px) scale(0.8);
     opacity: 0;
@@ -388,6 +393,7 @@ onUnmounted(() => {
   white-space: pre-wrap;
   overflow: hidden;
 }
+
 .meet-team-wrapper {
   position: relative;
   overflow: hidden;
@@ -446,40 +452,179 @@ onUnmounted(() => {
 }
 
 @keyframes floatFull {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  20% { transform: translate(100%, 50%) rotate(60deg); }
-  40% { transform: translate(50%, 100%) rotate(-60deg); }
-  60% { transform: translate(-50%, 50%) rotate(30deg); }
-  80% { transform: translate(25%, -50%) rotate(-30deg); }
+
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  20% {
+    transform: translate(100%, 50%) rotate(60deg);
+  }
+
+  40% {
+    transform: translate(50%, 100%) rotate(-60deg);
+  }
+
+  60% {
+    transform: translate(-50%, 50%) rotate(30deg);
+  }
+
+  80% {
+    transform: translate(25%, -50%) rotate(-30deg);
+  }
 }
 
-.key:nth-child(21) { left: 10%; top: 15%; animation-delay: -1s; }
-.key:nth-child(22) { left: 25%; top: 35%; animation-delay: -3s; }
-.key:nth-child(23) { left: 40%; top: 55%; animation-delay: -5s; }
-.key:nth-child(24) { left: 55%; top: 75%; animation-delay: -7s; }
-.key:nth-child(25) { left: 70%; top: 25%; animation-delay: -2s; }
-.key:nth-child(26) { left: 85%; top: 45%; animation-delay: -4s; }
-.key:nth-child(27) { left: 20%; top: 65%; animation-delay: -6s; }
-.key:nth-child(28) { left: 35%; top: 85%; animation-delay: -8s; }
-.key:nth-child(29) { left: 50%; top: 5%; animation-delay: -1s; }
-.key:nth-child(30) { left: 65%; top: 95%; animation-delay: -3s; }
-.key:nth-child(31) { left: 80%; top: 15%; animation-delay: -5s; }
-.key:nth-child(32) { left: 95%; top: 35%; animation-delay: -7s; }
-.key:nth-child(33) { left: 5%; top: 55%; animation-delay: -2s; }
-.key:nth-child(34) { left: 30%; top: 75%; animation-delay: -4s; }
-.key:nth-child(35) { left: 45%; top: 25%; animation-delay: -6s; }
+.key:nth-child(21) {
+  left: 10%;
+  top: 15%;
+  animation-delay: -1s;
+}
+
+.key:nth-child(22) {
+  left: 25%;
+  top: 35%;
+  animation-delay: -3s;
+}
+
+.key:nth-child(23) {
+  left: 40%;
+  top: 55%;
+  animation-delay: -5s;
+}
+
+.key:nth-child(24) {
+  left: 55%;
+  top: 75%;
+  animation-delay: -7s;
+}
+
+.key:nth-child(25) {
+  left: 70%;
+  top: 25%;
+  animation-delay: -2s;
+}
+
+.key:nth-child(26) {
+  left: 85%;
+  top: 45%;
+  animation-delay: -4s;
+}
+
+.key:nth-child(27) {
+  left: 20%;
+  top: 65%;
+  animation-delay: -6s;
+}
+
+.key:nth-child(28) {
+  left: 35%;
+  top: 85%;
+  animation-delay: -8s;
+}
+
+.key:nth-child(29) {
+  left: 50%;
+  top: 5%;
+  animation-delay: -1s;
+}
+
+.key:nth-child(30) {
+  left: 65%;
+  top: 95%;
+  animation-delay: -3s;
+}
+
+.key:nth-child(31) {
+  left: 80%;
+  top: 15%;
+  animation-delay: -5s;
+}
+
+.key:nth-child(32) {
+  left: 95%;
+  top: 35%;
+  animation-delay: -7s;
+}
+
+.key:nth-child(33) {
+  left: 5%;
+  top: 55%;
+  animation-delay: -2s;
+}
+
+.key:nth-child(34) {
+  left: 30%;
+  top: 75%;
+  animation-delay: -4s;
+}
+
+.key:nth-child(35) {
+  left: 45%;
+  top: 25%;
+  animation-delay: -6s;
+}
 
 /* Position words */
-.word:nth-child(36) { left: 5%; top: 85%; animation-delay: -1s; }
-.word:nth-child(37) { left: 25%; top: 15%; animation-delay: -3s; }
-.word:nth-child(38) { left: 45%; top: 45%; animation-delay: -5s; }
-.word:nth-child(39) { left: 65%; top: 75%; animation-delay: -7s; }
-.word:nth-child(40) { left: 85%; top: 5%; animation-delay: -2s; }
-.word:nth-child(41) { left: 15%; top: 35%; animation-delay: -4s; }
-.word:nth-child(42) { left: 35%; top: 65%; animation-delay: -6s; }
-.word:nth-child(43) { left: 55%; top: 95%; animation-delay: -8s; }
-.word:nth-child(44) { left: 75%; top: 25%; animation-delay: -1s; }
-.word:nth-child(45) { left: 95%; top: 55%; animation-delay: -3s; }
+.word:nth-child(36) {
+  left: 5%;
+  top: 85%;
+  animation-delay: -1s;
+}
+
+.word:nth-child(37) {
+  left: 25%;
+  top: 15%;
+  animation-delay: -3s;
+}
+
+.word:nth-child(38) {
+  left: 45%;
+  top: 45%;
+  animation-delay: -5s;
+}
+
+.word:nth-child(39) {
+  left: 65%;
+  top: 75%;
+  animation-delay: -7s;
+}
+
+.word:nth-child(40) {
+  left: 85%;
+  top: 5%;
+  animation-delay: -2s;
+}
+
+.word:nth-child(41) {
+  left: 15%;
+  top: 35%;
+  animation-delay: -4s;
+}
+
+.word:nth-child(42) {
+  left: 35%;
+  top: 65%;
+  animation-delay: -6s;
+}
+
+.word:nth-child(43) {
+  left: 55%;
+  top: 95%;
+  animation-delay: -8s;
+}
+
+.word:nth-child(44) {
+  left: 75%;
+  top: 25%;
+  animation-delay: -1s;
+}
+
+.word:nth-child(45) {
+  left: 95%;
+  top: 55%;
+  animation-delay: -3s;
+}
 
 /* Ensure Teamsection is above the background */
 :deep(.meet-team-section) {

@@ -139,14 +139,14 @@ async function getUserIdByEmail(email) {
 }
 
 // Function to add an attempt by the user to the DB.
-async function insertAttempt(email, characters_attempted, characters_missed, wpm) {
+async function insertAttempt(user_id, characters_attempted, characters_missed, wpm) {
   const insertAttemptSQL = `
     INSERT INTO user_attempts (user_id, characters_attempted, characters_missed, wpm) 
     VALUES (?, ?, ?, ?)  
   `;
 
   try {
-    const user_id = getUserIdByEmail(email);
+    // const user_id = getUserIdByEmail(email);
 
     const [result] = await pool.query(insertAttemptSQL, [user_id, characters_attempted, characters_missed, wpm]);
 
@@ -163,7 +163,6 @@ async function insertAttempt(email, characters_attempted, characters_missed, wpm
 
     return {
       id: result.insertId,
-      email,
       attempt_number: attemptDetails[0].attempt_number,
       wpm,
       characters_attempted,
@@ -210,4 +209,5 @@ module.exports = {
   insertUser,
   insertAttempt,
   deleteUser,
+  getUserIdByEmail,
 };
