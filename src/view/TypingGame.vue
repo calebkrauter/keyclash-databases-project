@@ -5,7 +5,7 @@
       <h1>Let The Battle Begin!</h1>
       <div class="game-area">
         <p class="text-to-type">{{ currentText }}</p>
-        <input v-model="userInput" v-show="gameStarted" @input="checkInput" @keydown="handleKeydown"
+        <input v-model="userInput" v-show="gameStarted" @input="checkInput" @keydown="handleKeydown" ref="inputField"
           :disabled="!gameStarted || gameEnded" placeholder="Type here..." style="color: transparent" />
         <!-- Reference for font from Google: https://fonts.google.com/selection/embed -->
         <p id="userInput" v-show="gameStarted" @keydown="handleKeydown" :style="inputTextStyle" style="margin-top: -55px;
@@ -13,7 +13,8 @@
           font-weight: 400;
           font-style: normal;">{{ userInputConstrained }}</p>
         <p style="margin-top: 40px;" v-if="gameEnded">Game Over! Your WPM: {{ wpm }}</p>
-        <button @click="startGame" v-if="!gameStarted && roundsEnded" :class="{ 'play-btn': true }">Start Game</button>
+        <button title="Press Enter To Start!" @click="startRound" v-if="!gameStarted && roundsEnded"
+          :class="{ 'play-btn': true }">Start Game</button>
         <p style="margin-top: 40px;" v-if="pasteToWin">We don't allow PASTE TO WIN...</p>
       </div>
       <Leaderboard class="leaderboard" />
@@ -23,7 +24,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, watch, nextTick, computed, onMounted } from 'vue';
 // Reference: Claude AI and ChatGPT4o/3 were used to help with word generation and simple code to house it.
 // TODO ask AI if the word types are correct.
 import { storeToRefs } from 'pinia';
@@ -77,7 +78,6 @@ const texts = [];
 const roundsToPlay = 3;
 const curRound = ref(0);
 
-
 function generateSentence() {
   return appendWord();
 }
@@ -112,7 +112,6 @@ const roundsEnded = ref(true);
 const gameEnded = ref(false);
 const startTime = ref(0);
 const endTime = ref(0);
-// const API_URL = process.env.API_URL || 'http://localhost:5001'; 
 const API_URL = 'http://localhost:5001';
 const pasteToWin = ref(false);
 const playTenRounds = ref(false);
@@ -127,7 +126,7 @@ const perfectionist = ref(false);
 const username = ref('');
 const completeUserInputText = ref('');
 const completeText = ref('');
-
+const inputField = ref(null);
 let curWordIndex = 0;
 let curCharTextColor = "black";
 let pasteDoneOnce = false;
@@ -143,14 +142,13 @@ const wpm = computed(() => {
   return Math.round(wordsTyped / timeInMinutes);
 });
 
-function startGame() {
+function startRound() {
   if (curRound.value === 0) {
     startTime.value = Date.now();
   }
   texts.push(generateSentence());
 
   attemptedCharacters += texts[curRound.value].length;
-  // console.log("cur count to attempt " + attemptedCharacters);
 
   roundsEnded.value = false;
   currentText.value = texts[curRound.value];
@@ -164,8 +162,19 @@ let backspacePressed = false;
 let shiftPressed = false
 let numOfWrongChars = 0;
 
+watch(gameStarted, () => {
+  nextTick(() => {
+    inputField.value.focus();
+  })
+})
 
-
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    if (!gameStarted.value && roundsEnded.value) {
+      startRound();
+    }
+  }
+})
 function handleKeydown(event) {
   const userStore = useDataStore();
   const { countClicks, countKeyPresses, countWordsTyped, countCharactersTyped, countBackspaces } = storeToRefs(userStore);
@@ -296,7 +305,7 @@ function checkInput() {
     } else {
       curWordIndex = 0;
       keysPressedIterator.value = -1;
-      startGame();
+      startRound();
     }
   }
   if (!backspacePressed) {
