@@ -103,6 +103,8 @@ const handleRegister = async () => {
     const data = await response.json();
     console.log('User registered:', data);
     successMessage.value = 'Registration successful!';
+    await authStore.login({ email: email.value });
+
     name.value = '';
     email.value = '';
     password.value = '';
@@ -113,8 +115,9 @@ const handleRegister = async () => {
   } catch (err) {
     console.error('Registration error:', err);
     error.value = 'Registration failed. Please try again.';
-  } finally {
-    await authStore.login({ email: email.value });
+  }
+  finally {
+
     isLoading.value = false;
     setTimeout(() => {
       router.push('/');
