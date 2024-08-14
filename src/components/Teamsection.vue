@@ -25,19 +25,19 @@ import { ref } from 'vue';
 
 const teamMembers = ref([
   {
-    name: 'James',
+    name: 'James Simpson',
     image: '/src/public/JamesAndMiki.jpg',
     github: 'https://github.com/jimothy-dev',
     linkedin: 'https://www.linkedin.com/in/jamessimpson012'
   },
   {
-    name: 'Johnny',
+    name: 'John Garnica',
     image: '/src/public/Johnny.jpg',
     github: 'https://github.com/jasgcode',
     linkedin: 'https://www.linkedin.com/in/jasgarnica'
   },
   {
-    name: 'Caleb',
+    name: 'Caleb Krauter',
     image: '/src/public/caleb.jpg',
     github: 'https://github.com/calebkrauter',
     linkedin: 'https://www.linkedin.com/in/calebkrauter'
