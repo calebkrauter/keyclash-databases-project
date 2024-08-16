@@ -3,42 +3,43 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
-const saltRounds = 10; 
+const saltRounds = 10;
 const {
   insertUser,
   getUser,
   getLeaderboard,
+  getEmailByUsername,
   getUserIdByEmail,
   insertAttempt,
 } = require("../controller/queries");
 const { body, validationResult } = require("express-validator");
 
 router.post('/login', async (req, res) => {
-    try {
-      const { email, password } = req.body;
-      const user = await getUser(email, password);
-      
-      // If authentication is successful, create a token
-      const token = jwt.sign(
-        { userId: user.id, email: user.email },
-        process.env.JWT_SECRET_KEY,
-        { expiresIn: '1h' }
-      );
-  
-      res.status(200).json({ 
-        message: 'Login successful', 
-        user: { id: user.id, username: user.username, email: user.email },
-        token: token
-      });
-    } catch (err) {
-      console.error("Login error:", err);
-      if (err.message === "User not found" || err.message === "Incorrect password") {
-        res.status(401).json({ error: err.message });
-      } else {
-        res.status(500).json({ error: "An error occurred during login. Please try again later." });
-      }
+  try {
+    const { email, password } = req.body;
+    const user = await getUser(email, password);
+
+    // If authentication is successful, create a token
+    const token = jwt.sign(
+      { userId: user.id, email: user.email },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: '1h' }
+    );
+
+    res.status(200).json({
+      message: 'Login successful',
+      user: { id: user.id, username: user.username, email: user.email },
+      token: token
+    });
+  } catch (err) {
+    console.error("Login error:", err);
+    if (err.message === "User not found" || err.message === "Incorrect password") {
+      res.status(401).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "An error occurred during login. Please try again later." });
     }
-  });
+  }
+});
 router.get("/leaderboard", async (req, res) => {
   try {
     const result = await getLeaderboard();
@@ -109,8 +110,10 @@ router.post(
 
 router.post("/attempt", async (req, res) => {
   try {
-    const { characters_attempted, characters_missed, wpm, email } = req.body;
-    const getUserId = await getUserIdByEmail(email);
+    const { characters_attempted, characters_missed, wpm, username } = req.body;
+    console.log(username)
+
+    const getUserId = await getUserIdByEmail(await getEmailByUsername(username));
     const result = insertAttempt(
       getUserId,
       characters_attempted,

@@ -164,10 +164,10 @@ async function getUserStats(username) {
 }
 
 async function getUserIdByEmail(email) {
-  const sql = "SELECT user_id FROM user_info WHERE email = ?";
+  const query = "SELECT user_id FROM user_info WHERE email = ?";
 
   try {
-    const [rows] = await pool.query(sql, [email]);
+    const [rows] = await pool.query(query, [email]);
 
     if (rows.length === 0) {
       throw new Error("User not found");
@@ -180,36 +180,45 @@ async function getUserIdByEmail(email) {
   }
 }
 
+async function getEmailByUsername(username) {
+  const query = "SELECT email FROM user_info WHERE username = ?;";
+  try {
+    const [rows] = await pool.query(query, [username]);
+    if (rows.length === 0) {
+      throw new Error("Email not found.");
+    }
+    return rows[0].email;
+  } catch (err) {
+    throw err;
+  }
+}
+
 // Function to add an attempt by the user to the DB.
-async function insertAttempt(email, characters_attempted, characters_missed, wpm) {
-  const query = `
-    INSERT INTO user_attempts (user_id, characters_attempted, characters_missed, wpm) 
-    VALUES (?, ?, ?, ?)  
-  `;
+async function insertAttempt(user_id, characters_attempted, characters_missed, wpm) {
+  const insertAttemptSQL =
+    `
+      INSERT INTO user_attempts (user_id, characters_attempted, characters_missed, wpm) 
+      VALUES (?, ?, ?, ?)
+    `;
 
   try {
-    const user_id = getUserIdByEmail(email);
+    // const user_id = await getUserIdByEmail(email);
 
-    const [result] = await pool.query(query, [user_id, characters_attempted, characters_missed, wpm]);
+    const [result] = await pool.query(insertAttemptSQL, [user_id, characters_attempted, characters_missed, wpm]);
 
     const [attemptDetails] = await pool.query(
       `
-      SELECT attempt_number
-      FROM user_attempts
-      WHERE user_id = ?
-      ORDER BY attempt_number DESC
-      LIMIT 1
-    `,
-      [user_id]
-    );
-
+        SELECT attempt_number
+        FROM user_attempts
+        WHERE user_id = ?
+        ORDER BY user_id;
+      `, [user_id]
+    )
     return {
       id: result.insertId,
-      email,
-      attempt_number: attemptDetails[0].attempt_number,
-      wpm,
       characters_attempted,
-      characters_missed
+      characters_missed,
+      wpm
     };
   } catch (err) {
     console.error('Error in insertAttempt:', err);
@@ -251,5 +260,6 @@ module.exports = {
   insertUser,
   insertAttempt,
   deleteUser,
+  getEmailByUsername,
   getUserIdByEmail,
 };

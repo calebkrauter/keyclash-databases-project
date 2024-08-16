@@ -35,11 +35,12 @@ import { storeToRefs } from 'pinia';
 import { useDataStore, useAuthStore } from '@/store';
 import Leaderboard from '../components/Leaderboard.vue';
 const userStore = useDataStore();
+
 const { countClicks, countKeyPresses } = storeToRefs(userStore);
 const { incrementClicks, incrementKeyPresses } = userStore;
 
 const authStore = useAuthStore();
-const { isLoggedIn, login } = storeToRefs(authStore)
+const { isLoggedIn, login, username } = storeToRefs(authStore)
 
 window.onclick = () => {
   incrementClicks();
@@ -129,7 +130,7 @@ const slowPoke = ref(false);
 const easterEgg = ref(false);
 const perfectRun = ref(false);
 const perfectionist = ref(false);
-const username = ref('');
+const usernameLocal = ref('');
 const completeUserInputText = ref('');
 const completeText = ref('');
 const inputField = ref(null);
@@ -351,6 +352,7 @@ function sentenceFeedback() {
 }
 const curWPM = ref(wpm);
 async function saveAttempt() {
+  console.log(authStore.username)
   console.log("saving user attempt")
   if (!authStore.isLoggedIn) {
     console.log('User not logged in. Attempt not saved.');
@@ -366,14 +368,14 @@ async function saveAttempt() {
         characters_attempted: attemptedCharacters.value,
         characters_missed: numOfWrongChars.value,
         wpm: curWPM.value,
-        email: authStore.user.name
+        username: authStore.username
       })
     });
     console.log(({
       characters_attempted: attemptedCharacters.value,
       characters_missed: numOfWrongChars.value,
       wpm: curWPM.value,
-      email: authStore.user.name
+      username: authStore.username
     }))
 
     if (!response.ok) {
@@ -401,7 +403,7 @@ const handleAchievements = async () => {
     easter_egg: easterEgg.value,
     perfect_run: perfectRun.value,
     perfectionist: perfectionist.value,
-    username: username.value,
+    usernameLocal: usernameLocal.value,
   }
   try {
     const response = await fetch(`${API_URL}/api/achievement`, {
