@@ -28,7 +28,7 @@ async function getUser(email, password) {
       WHERE email = ?
     `;
     const [results] = await pool.query(sql, [email]);
-    
+
     if (results.length === 0) {
       console.log(`No user found with email: ${email}`);
       throw new Error('User not found');
@@ -36,7 +36,7 @@ async function getUser(email, password) {
 
     console.log(`User found with email: ${email}`);
     const user = results[0];
-    
+
     console.log('Comparing passwords...');
     console.log('Stored hash:', user.password_hash);
     console.log('Provided password length:', password.length);
@@ -181,56 +181,41 @@ async function getUserIdByEmail(email) {
 }
 
 // Function to add an attempt by the user to the DB.
-<<<<<<< HEAD
-async function insertAttempt(
-  user_id,
-  characters_attempted,
-  characters_missed,
-  wpm
-) {
-  const insertAttemptSQL = `
-=======
-async function insertAttempt(user_id, characters_attempted, characters_missed, wpm) {
+async function insertAttempt(email, characters_attempted, characters_missed, wpm) {
   const query = `
->>>>>>> f2c6b039f1968d83842f576f4771dbb0e9c0c269
     INSERT INTO user_attempts (user_id, characters_attempted, characters_missed, wpm) 
-    VALUES (?, ?, ?, ?);  
+    VALUES (?, ?, ?, ?)  
   `;
 
   try {
-    // const user_id = getUserIdByEmail(email);
+    const user_id = getUserIdByEmail(email);
 
-    const [result] = await pool.query(insertAttemptSQL, [
-      user_id,
-      characters_attempted,
-      characters_missed,
-      wpm,
-    ]);
+    const [result] = await pool.query(query, [user_id, characters_attempted, characters_missed, wpm]);
 
-    const [result] = await pool.query(
+    const [attemptDetails] = await pool.query(
       `
-        SELECT attempt_number
-        FROM user_attempts
-        WHERE user_id = ?
-        ORDER BY attempt_number DESC
-        LIMIT 1
-      `,
+      SELECT attempt_number
+      FROM user_attempts
+      WHERE user_id = ?
+      ORDER BY attempt_number DESC
+      LIMIT 1
+    `,
       [user_id]
     );
 
     return {
       id: result.insertId,
+      email,
       attempt_number: attemptDetails[0].attempt_number,
       wpm,
       characters_attempted,
-      characters_missed,
+      characters_missed
     };
   } catch (err) {
-    console.error("Error in insertAttempt:", err);
+    console.error('Error in insertAttempt:', err);
     throw err;
   }
 }
-
 // Function to delete a user's account from the DB. Will cascade.
 async function deleteUser(username) {
   const sql = `
