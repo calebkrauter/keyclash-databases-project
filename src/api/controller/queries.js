@@ -172,7 +172,7 @@ async function insertAttempt(user_id, characters_attempted, characters_missed, w
       attempt_number: attemptDetails[0].attempt_number,
       wpm,
       characters_attempted,
-      characters_missed
+      characters_missed,
     };
   } catch (err) {
     console.error('Error in insertAttempt:', err);
