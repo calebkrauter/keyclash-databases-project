@@ -156,7 +156,7 @@ async function insertAttempt(user_id, characters_attempted, characters_missed, w
 
     const [result] = await pool.query(insertAttemptSQL, [user_id, characters_attempted, characters_missed, wpm]);
 
-    const [attemptDetails] = await pool.query(
+    const [result] = await pool.query(
       `
         SELECT attempt_number
         FROM user_attempts
