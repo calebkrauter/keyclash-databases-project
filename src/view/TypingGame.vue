@@ -6,7 +6,7 @@
       <div class="game-area">
         <p v-if="gameStarted && !gameEnded" class="text-to-type"><span style="color: purple;">{{
           currentText[curWordIndex]
-        }}</span> <span>{{
+            }}</span> <span>{{
               currentText[curWordIndex + 1] }}</span></p>
         <input v-model="userInput" v-show="gameStarted" @input="checkInput" @keydown="handleKeydown" ref="inputField"
           :disabled="!gameStarted || gameEnded" placeholder="Type here..."
@@ -34,7 +34,6 @@ import { ref, watch, nextTick, computed, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useDataStore, useAuthStore } from '@/store';
 import Leaderboard from '../components/Leaderboard.vue';
-
 const userStore = useDataStore();
 const { countClicks, countKeyPresses } = storeToRefs(userStore);
 const { incrementClicks, incrementKeyPresses } = userStore;
@@ -318,7 +317,7 @@ function checkInput() {
       pasteDoneOnce = false;
       gameStarted.value = false;
       roundsEnded.value = true;
-
+      // fetchLeaderboard();
     } else {
       curWordIndex = 0;
       keysPressedIterator.value = -1;
@@ -352,6 +351,7 @@ function sentenceFeedback() {
 }
 const curWPM = ref(wpm);
 async function saveAttempt() {
+  console.log("saving user attempt")
   if (!authStore.isLoggedIn) {
     console.log('User not logged in. Attempt not saved.');
     return;

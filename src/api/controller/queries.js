@@ -1,5 +1,5 @@
 const pool = require('../config/db');
-
+const bcrypt = require('bcrypt')
 // Function to display all users with ranks.
 async function getLeaderboard() {
   const sql = `
@@ -18,20 +18,44 @@ async function getLeaderboard() {
     throw err;
   }
 }
-
-// Function for login to find matching user in db.
 async function getUser(email, password_hash) {
   try {
     const sql = `
-      SELECT email, password_hash 
-      FROM user_info 
-      WHERE email = ? AND password_hash = ?
-    `;
+        SELECT email, password_hash 
+        FROM user_info 
+        WHERE email = ? AND password_hash = ?
+      `;
     const [result] = await pool.query(sql, [email, password_hash]);
     console.log(result);
     return result;
   } catch (err) {
     throw err + " User data does not match.";
+  }
+}
+
+// Function for login to find matching user in db.
+async function insertUser(username, email, password) {
+  const sql = `
+    INSERT INTO user_info (username, email, password_hash) 
+    VALUES (?, ?, ?);
+  `;
+
+  try {
+    // Hash the password
+    const saltRounds = 10;
+    const password_hash = await bcrypt.hash(password, saltRounds);
+
+    const [result] = await pool.query(sql, [username, email, password_hash]);
+    return { id: result.insertId, username, email };
+  } catch (err) {
+    if (err.code === 'ER_DUP_ENTRY') {
+      if (err.sqlMessage.includes('email')) {
+        return { error: 'Email already exists' };
+      } else if (err.sqlMessage.includes('username')) {
+        return { error: 'Username already exists' };
+      }
+    }
+    return { error: 'Registration failed' };
   }
 }
 
@@ -102,24 +126,6 @@ async function getUserStats(username) {
   }
 }
 
-// Function for registering new user and adding to DB.
-async function insertUser(username, email, password_hash) {
-  const sql = `
-    INSERT INTO user_info (username, email, password_hash) 
-    VALUES (?, ?, ?);
-  `;
-
-  try {
-    console.log('Attempting to insert user:', { username, email });
-    const [result] = await pool.query(sql, [username, email, password_hash]);
-    console.log('User inserted successfully:', result);
-    return { id: result.insertId, username, email };
-  } catch (err) {
-    console.error('Error in insertUser:', err);
-    console.error('Error stack:', err.stack);
-    throw err;
-  }
-}
 
 async function getUserIdByEmail(email) {
   const sql = 'SELECT user_id FROM user_info WHERE email = ?';
@@ -142,7 +148,7 @@ async function getUserIdByEmail(email) {
 async function insertAttempt(user_id, characters_attempted, characters_missed, wpm) {
   const insertAttemptSQL = `
     INSERT INTO user_attempts (user_id, characters_attempted, characters_missed, wpm) 
-    VALUES (?, ?, ?, ?)  
+    VALUES (?, ?, ?, ?);  
   `;
 
   try {

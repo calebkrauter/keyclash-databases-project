@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 const API_URL = 'http://localhost:5001';
 const leaderboardData = ref([]);
@@ -46,9 +46,20 @@ const fetchLeaderboard = async () => {
   }
 };
 
+let interval = null;
+function pollLeaderboard() {
+  setInterval(fetchLeaderboard, 5000);
+}
+
+
 onMounted(() => {
   fetchLeaderboard();
+  pollLeaderboard();
 });
+onUnmounted(() => {
+  clearInterval(interval)
+});
+// provide('fetchLeaderboard', fetchLeaderboard);
 </script>
 
 <style scoped>
@@ -63,7 +74,8 @@ table {
   margin-top: 20px;
 }
 
-th, td {
+th,
+td {
   padding: 10px;
   text-align: left;
   border-bottom: 1px solid #ddd;

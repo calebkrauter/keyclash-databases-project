@@ -29,6 +29,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useDataStore, useAuthStore } from '@/store';
+// import { API_URL } from '@/config';
 
 const userStore = useDataStore();
 
@@ -59,25 +60,30 @@ const isLoading = ref(false);
 
 const API_URL = 'http://localhost:5001';
 
-const handleRegister = async () => {
 
+const handleRegister = async (name, email, password, confirmPassword) => {
+  const error = ref('');
+  const successMessage = ref('');
+  const isLoading = ref(false);
+  const router = useRouter();
+  const authStore = useAuthStore();
 
-  error.value = '';
-  successMessage.value = '';
+  const validateInputs = () => {
+    if (!name.value || !email.value || !password.value || !confirmPassword.value) {
+      throw new Error('All fields are required');
+    }
+    if (password.value !== confirmPassword.value) {
+      throw new Error('Passwords do not match');
+    }
+    if (password.value.length < 8) {
+      throw new Error('Password must be at least 8 characters long');
+    }
+    if (!/\S+@\S+\.\S+/.test(email.value)) {
+      throw new Error('Invalid email format');
+    }
+  };
 
-  if (password.value !== confirmPassword.value) {
-    error.value = 'Passwords do not match';
-    return;
-  }
-
-  // const hashedPassword = await bcrypt.hash(password.value, 10);
-
-  isLoading.value = true;
-
-  try {
-    // const userStore = useDataStore();
-    // const { timeOfRegistration } = storeToRefs(userStore);
-    // const { getTimeSinceRegister } = userStore;
+  const registerUser = async () => {
     const response = await fetch(`${API_URL}/api/register`, {
       method: 'POST',
       headers: {
@@ -86,44 +92,46 @@ const handleRegister = async () => {
       body: JSON.stringify({
         username: name.value,
         email: email.value,
-        //password_hash: hashedPassword.value
         password_hash: password.value
       }),
     });
-    console.log(({
-      username: name.value,
-      email: email.value,
-      //password_hash: hashedPassword.value
-      password_hash: password.value
 
-    }));
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorData = await response.json();
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
     }
-    const data = await response.json();
+
+    return await response.json();
+  };
+
+  try {
+    isLoading.value = true;
+    validateInputs();
+
+    const data = await registerUser();
     console.log('User registered:', data);
     successMessage.value = 'Registration successful!';
-    await authStore.login({ email: email.value });
 
+    await authStore.login({ email: email.value, password: password.value });
+
+    // Clear form fields
     name.value = '';
     email.value = '';
     password.value = '';
     confirmPassword.value = '';
-    hashedPassword.value = '';
-    getTimeSinceRegister();
-    console.log(timeOfRegistration);
-  } catch (err) {
-    console.error('Registration error:', err);
-    error.value = 'Registration failed. Please try again.';
-  }
-  finally {
 
-    isLoading.value = false;
+    // Redirect after a short delay
     setTimeout(() => {
       router.push('/');
     }, 1000);
-
+  } catch (err) {
+    console.error('Registration error:', err);
+    error.value = err.message || 'Registration failed. Please try again.';
+  } finally {
+    isLoading.value = false;
   }
+
+  return { error: error.value, successMessage: successMessage.value, isLoading: isLoading.value };
 };
 
 </script>
