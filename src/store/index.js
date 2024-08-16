@@ -53,7 +53,7 @@ export const useAuthStore = defineStore('auth', () => {
   const API_URL = 'http://localhost:5001';
 
   // Getters  
-  const username = ref(localStorage.getItem('user') || null)
+  const username = computed(() => user.value?.username || localStorage.getItem('user') || null)
 
   // Actions
   async function login(credentials) {
@@ -71,8 +71,8 @@ export const useAuthStore = defineStore('auth', () => {
       }
 
       const data = await response.json();
+      // console.log(json.loads(token.split('.')[1].base64.urlsafe_b64decode(token.split('.')[1])));
       token.value = data.token;
-      
       isLoggedIn.value = true;
       user.value = data.user;
       localStorage.setItem('token', data.token);
