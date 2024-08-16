@@ -146,7 +146,7 @@ async function getUserIdByEmail(email) {
 
 // Function to add an attempt by the user to the DB.
 async function insertAttempt(user_id, characters_attempted, characters_missed, wpm) {
-  const insertAttemptSQL = `
+  const query = `
     INSERT INTO user_attempts (user_id, characters_attempted, characters_missed, wpm) 
     VALUES (?, ?, ?, ?);  
   `;
