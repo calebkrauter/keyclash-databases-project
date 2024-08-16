@@ -9,7 +9,7 @@ services:
       #   - your-registry/your-vue-app:latest
     container_name: vue-game-container-frontend
     ports:
-      - "80:80"
+      - "100:100"
     platform: linux/amd64
   vue-game-backend:
     build:
