@@ -181,6 +181,7 @@ async function getUserIdByEmail(email) {
 }
 
 // Function to add an attempt by the user to the DB.
+<<<<<<< HEAD
 async function insertAttempt(
   user_id,
   characters_attempted,
@@ -188,6 +189,10 @@ async function insertAttempt(
   wpm
 ) {
   const insertAttemptSQL = `
+=======
+async function insertAttempt(user_id, characters_attempted, characters_missed, wpm) {
+  const query = `
+>>>>>>> f2c6b039f1968d83842f576f4771dbb0e9c0c269
     INSERT INTO user_attempts (user_id, characters_attempted, characters_missed, wpm) 
     VALUES (?, ?, ?, ?);  
   `;
@@ -202,7 +207,7 @@ async function insertAttempt(
       wpm,
     ]);
 
-    const [attemptDetails] = await pool.query(
+    const [result] = await pool.query(
       `
         SELECT attempt_number
         FROM user_attempts
