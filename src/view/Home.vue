@@ -5,7 +5,7 @@
     <section class="welcome-section">
       <div class="initial-content">
         <h1 v-if="authStore.isLoggedIn === false" class="typing-animation">Welcome to KeyClash</h1>
-        <h1 v-if="authStore.isLoggedIn === true" class="typing-animation">Welcome {{ authStore.user.name }}</h1>
+        <h1 v-if="authStore.isLoggedIn === true" class="typing-animation">Welcome {{ authStore.username}}</h1>
         <p class="typing-animation">
           <span class="hidden">Discover the ultimate typing challenge!</span>
         </p>
@@ -71,6 +71,7 @@ const router = useRouter();
 const authStore = useAuthStore();
 const { isLoggedIn, username } = storeToRefs(authStore);
 const user = authStore.user;
+
 const teamSection = ref(null);
 const popOutText = ref(null);
 const handleScroll = () => {
@@ -185,6 +186,7 @@ const startGame = () => {
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll);
+  useAuthStore()
   handleScroll(); // Check visibility on initial load
   startTypingAnimation(aboutTitle, 500);
   startTypingAnimation(aboutDescription, 2000);

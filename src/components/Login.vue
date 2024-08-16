@@ -1,151 +1,135 @@
-
 <template>
-    <div class="login-form">
-      <form @submit.prevent="handleLogin">
-        <div class="form-group">
-          <label for="email">Email:</label>
-          <input type="email" id="email" v-model="email" required>
-        </div>
-        <div class="form-group">
-          <label for="password">Password:</label>
-          <input type="password" id="password" v-model="password" required>
-        </div>
-        <button type="submit">Login</button>
-      </form>
-    </div>
-  </template>
-  
+  <div class="login-form">
+    <form @submit.prevent="handleLogin">
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" v-model="email" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" v-model="password" required>
+      </div>
+      <button type="submit" :disabled="isLoading">
+        {{ isLoading ? 'Logging in...' : 'Login' }}
+      </button>
+    </form>
+    <p v-if="error" class="error-message">{{ error }}</p>
+    <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
+  </div>
+</template>
 
-  <script setup>
-  import { ref } from 'vue';
-  import { useRouter } from 'vue-router';
-  import { useAuthStore } from '@/store'; // Make sure this path is correct
-  import { storeToRefs } from 'pinia';
-  import { useDataStore } from '@/store';
+<script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore, useDataStore } from '@/store';
+import { storeToRefs } from 'pinia';
+import { onMounted, onUnmounted } from 'vue';
 
-  const userStore = useDataStore();
-  const { countClicks, countKeyPresses } = storeToRefs(userStore);
-  const { incrementClicks, incrementKeyPresses } = userStore;
+const router = useRouter();
+const authStore = useAuthStore();
+const userStore = useDataStore();
 
-  window.onclick = () => {
-    incrementClicks();
-  }
+const { isLoggedIn } = storeToRefs(authStore);
+const { countClicks, countKeyPresses } = storeToRefs(userStore);
+const { incrementClicks, incrementKeyPresses } = userStore;
 
-  window.onkeydown = () => {
-    incrementKeyPresses();
-  }
-  const router = useRouter();
-  const email = ref('');
-  const password = ref('');
-  const API_URL = 'http://localhost:5001';
-  
-  const authStore = useAuthStore();
-  const {isLoggedIn, login} = storeToRefs(authStore)
-  
-  const handleLogin = async () => {
-    console.log('Login attempt', { email: email.value, password: password.value });
-    try {
-      const response = await fetch(`${API_URL}/api/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email.value,
-          password_hash: password.value
-        })
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      
-      // TODO query to check if the login exists or not.
+const email = ref('');
+const password = ref('');
+const error = ref('');
+const successMessage = ref('');
+const isLoading = ref(false);
 
-      // Use the Pinia store to login
-      await authStore.login({ email: email.value });
-      console.log('Logged in:', authStore.isLoggedIn);
-      
-      // Redirect or perform other actions after successful login
-      router.push('/'); 
-    } catch (err) {
-      console.error('Login failed:', err);
-      // Handle login error (show message to user, etc.)
-    }
-  };
-  </script>
-  
-  
-  <style scoped>
-  .login-form {
-    max-width: 300px;
-    margin: 0 auto;
+const handleLogin = async () => {
+  error.value = '';
+  successMessage.value = '';
+  isLoading.value = true;
+
+  try {
+    await authStore.login({ email: email.value, password: password.value });
+    
+    successMessage.value = 'Login successful!';
+    
+    // Redirect after a short delay
+    setTimeout(() => {
+      router.push('/');
+    }, 1000);
+  } catch (err) {
+    console.error('Login failed:', err);
+    error.value = err.message || 'Login failed. Please try again.';
+  } finally {
+    isLoading.value = false;
   }
-  
-  .form-group {
-    margin-bottom: 15px;
-  }
-  
-  label {
-    display: block;
-    margin-bottom: 5px;
-  }
-  
-  input {
-    width: 100%;
-    padding: 8px;
-    font-size: 16px;
-  }
-  
-  button {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  </style>
-  
-  <style scoped>
-  .login-form {
-    max-width: 300px;
-    margin: 0 auto;
-  }
-  
-  .form-group {
-    margin-bottom: 15px;
-  }
-  
-  label {
-    display: block;
-    margin-bottom: 5px;
-  }
-  
-  input {
-    width: 100%;
-    padding: 8px;
-    font-size: 16px;
-  }
-  
-  button {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  </style>
+};
+
+const handleClick = () => {
+  incrementClicks();
+  console.log(countClicks.value);
+};
+
+const handleKeyDown = () => {
+  incrementKeyPresses();
+  console.log(countKeyPresses.value);
+};
+
+onMounted(() => {
+  window.addEventListener('click', handleClick);
+  window.addEventListener('keydown', handleKeyDown);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('click', handleClick);
+  window.removeEventListener('keydown', handleKeyDown);
+});
+</script>
+
+<style scoped>
+.login-form {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+}
+
+.success-message {
+  color: green;
+  margin-top: 10px;
+}
+</style>
