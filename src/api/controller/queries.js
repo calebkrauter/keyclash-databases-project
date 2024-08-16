@@ -193,7 +193,6 @@ async function insertAttempt(email, characters_attempted, characters_missed, wpm
     const [result] = await pool.query(query, [user_id, characters_attempted, characters_missed, wpm]);
 
     const [attemptDetails] = await pool.query(
-    const [attemptDetails] = await pool.query(
       `
       SELECT attempt_number
       FROM user_attempts
