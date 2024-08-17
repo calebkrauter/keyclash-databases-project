@@ -19,6 +19,22 @@
         </tr>
       </tbody>
     </table>
+    <table v-else>
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Username</th>
+          <th>Highscore</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(user, index) in leaderboardData" :key="index">
+          <td>{{ user.ranking }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.highscore }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
