@@ -19,11 +19,27 @@
         </tr>
       </tbody>
     </table>
+    <table v-else>
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Username</th>
+          <th>Highscore</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(user, index) in leaderboardData" :key="index">
+          <td>{{ user.ranking }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.highscore }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 const API_URL = 'http://localhost:5001';
 const leaderboardData = ref([]);
@@ -46,9 +62,20 @@ const fetchLeaderboard = async () => {
   }
 };
 
+let interval = null;
+function pollLeaderboard() {
+  setInterval(fetchLeaderboard, 5000);
+}
+
+
 onMounted(() => {
   fetchLeaderboard();
+  pollLeaderboard();
 });
+onUnmounted(() => {
+  clearInterval(interval)
+});
+// provide('fetchLeaderboard', fetchLeaderboard);
 </script>
 
 <style scoped>
@@ -63,7 +90,8 @@ table {
   margin-top: 20px;
 }
 
-th, td {
+th,
+td {
   padding: 10px;
   text-align: left;
   border-bottom: 1px solid #ddd;

@@ -6,7 +6,7 @@
 
 ### Prerequisites
 
-- Docker installed on your system. If you dont have docker installed please refer to this documentation. https://docs.docker.com/engine/install/
+- Docker installed on your system. If you don't have docker installed please refer to this documentation. https://docs.docker.com/engine/install/
 - Docker Desktop
 
 
@@ -21,6 +21,15 @@
 4. Give permission to the script, chmod +x run.sh
 
 5. Run the script, ./run.sh
+
+Alternative to run app without Docker.
+
+1. Clone the repository (if you haven't already):
+
+2. Run `npm run dev` to serve the frontend.
+
+3. Run `npm run start` to serve the backend.
+
 
 # Vue.js Frontend File Structure
 
@@ -144,4 +153,4 @@ This document explains the purpose of each package used in our Vue.js project.
 - `dev`: Starts the Vite development server
 - `build`: Builds the production-ready application using Vite
 - `preview`: Locally previews the production build
-- `start`: Starts the Express server (likely for production use)
+- `start`: Starts the Ex

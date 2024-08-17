@@ -19,7 +19,7 @@ const pinia = createPinia()
 const app = createApp(App)
 app.use(pinia)
 const route = useRoute();
-const API_URL = 'http://localhost:5001';
+// const API_URL = 'http://localhost:5001';
 
 
 const NavbarComponent = computed(() => {

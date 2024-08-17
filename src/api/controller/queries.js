@@ -1,5 +1,5 @@
-const pool = require('../config/db');
-
+const pool = require("../config/db");
+const bcrypt = require("bcryptjs");
 // Function to display all users with ranks.
 async function getLeaderboard() {
   const sql = `
@@ -19,19 +19,80 @@ async function getLeaderboard() {
   }
 }
 
-// Function for login to find matching user in db.
-async function getUser(email, password_hash) {
+async function getUser(email, password) {
   try {
+    console.log(`Attempting to find user with email: ${email}`);
     const sql = `
-      SELECT email, password_hash 
+      SELECT username, email, password_hash 
       FROM user_info 
-      WHERE email = ? AND password_hash = ?
+      WHERE email = ?
     `;
-    const [result] = await pool.query(sql, [email, password_hash]);
-    console.log(result);
-    return result;
+    const [results] = await pool.query(sql, [email]);
+
+    if (results.length === 0) {
+      console.log(`No user found with email: ${email}`);
+      throw new Error('User not found');
+    }
+
+    console.log(`User found with email: ${email}`);
+    const user = results[0];
+
+    console.log('Comparing passwords...');
+    console.log('Stored hash:', user.password_hash);
+    console.log('Provided password length:', password.length);
+    console.log('Bcrypt version:', bcrypt.version);
+
+    if (!user.password_hash) {
+      console.error('Stored password hash is null or undefined');
+      throw new Error('Invalid password hash');
+    }
+
+    if (!bcrypt.compare) {
+      console.error('bcrypt.compare is not a function');
+      throw new Error('Bcrypt library not properly loaded');
+    }
+
+    try {
+      const passwordMatch = await bcrypt.compare(password, user.password_hash);
+      console.log('Password match result:', passwordMatch);
+
+      if (!passwordMatch) {
+        console.log('Password does not match');
+        throw new Error('Incorrect password');
+      }
+
+      console.log('Password matches');
+      // Don't send the password hash back to the client
+      delete user.password_hash;
+      return user;
+    } catch (bcryptError) {
+      console.error('Bcrypt comparison error:', bcryptError);
+      throw new Error('Error during password comparison');
+    }
   } catch (err) {
-    throw err + " User data does not match.";
+    console.error('Error in getUser:', err);
+    throw err;
+  }
+}
+// Function for login to find matching user in db.
+async function insertUser(username, email, password_hash) {
+  const sql = `
+    INSERT INTO user_info (username, email, password_hash) 
+    VALUES (?, ?, ?);
+  `;
+
+  try {
+    const [result] = await pool.query(sql, [username, email, password_hash]);
+    return { id: result.insertId, username, email };
+  } catch (err) {
+    if (err.code === "ER_DUP_ENTRY") {
+      if (err.sqlMessage.includes("email")) {
+        return { error: "Email already exists" };
+      } else if (err.sqlMessage.includes("username")) {
+        return { error: "Username already exists" };
+      }
+    }
+    return { error: "Registration failed" };
   }
 }
 
@@ -64,13 +125,13 @@ async function getAttempts(username) {
   `;
 
   try {
-    console.log('Fetching attempts for user:', username);
+    console.log("Fetching attempts for user:", username);
     const [rows] = await pool.query(sql, [username]);
     console.log(`Retrieved ${rows.length} attempts for user:`, username);
     return rows;
   } catch (err) {
-    console.error('Error in getAttempts:', err);
-    console.error('Error stack:', err.stack);
+    console.error("Error in getAttempts:", err);
+    console.error("Error stack:", err.stack);
     throw err;
   }
 }
@@ -85,59 +146,85 @@ async function getUserStats(username) {
   `;
 
   try {
-    console.log('Fetching stats for user:', username);
+    console.log("Fetching stats for user:", username);
     const [rows] = await pool.query(sql, [username]);
 
     if (rows.length === 0) {
-      console.log('No stats found for user:', username);
+      console.log("No stats found for user:", username);
       return null;
     }
 
-    console.log('Retrieved stats for user:', username);
+    console.log("Retrieved stats for user:", username);
     return rows[0];
   } catch (err) {
-    console.error('Error in getUserStats:', err);
-    console.error('Error stack:', err.stack);
+    console.error("Error in getUserStats:", err);
+    console.error("Error stack:", err.stack);
     throw err;
   }
 }
 
-// Function for registering new user and adding to DB.
-async function insertUser(username, email, password_hash) {
-  const sql = `
-    INSERT INTO user_info (username, email, password_hash) 
-    VALUES (?, ?, ?);
-  `;
+async function getUserIdByEmail(email) {
+  const query = "SELECT user_id FROM user_info WHERE email = ?";
 
   try {
-    console.log('Attempting to insert user:', { username, email });
-    const [result] = await pool.query(sql, [username, email, password_hash]);
-    console.log('User inserted successfully:', result);
-    return { id: result.insertId, username, email };
+    const [rows] = await pool.query(query, [email]);
+
+    if (rows.length === 0) {
+      throw new Error("User not found");
+    }
+
+    return rows[0].user_id;
   } catch (err) {
-    console.error('Error in insertUser:', err);
-    console.error('Error stack:', err.stack);
+    console.error("Error in getUserIdByEmail:", err);
+    throw err;
+  }
+}
+
+async function getEmailByUsername(username) {
+  const query = "SELECT email FROM user_info WHERE username = ?;";
+  try {
+    const [rows] = await pool.query(query, [username]);
+    if (rows.length === 0) {
+      throw new Error("Email not found.");
+    }
+    return rows[0].email;
+  } catch (err) {
     throw err;
   }
 }
 
 // Function to add an attempt by the user to the DB.
-async function insertAttempt(username, characters_attempted, characters_missed, wpm) {
-  const sql = `
-    INSERT INTO user_attempts (user_id, characters_attempted, characters_missed, wpm) 
-    SELECT ui.user_id, ?, ?, ?
-    FROM user_info ui
-    WHERE ui.username = ?;
-  `;
+async function insertAttempt(user_id, characters_attempted, characters_missed, wpm) {
+  const insertAttemptSQL =
+    `
+      INSERT INTO user_attempts (user_id, characters_attempted, characters_missed, wpm) 
+      VALUES (?, ?, ?, ?)
+    `;
 
   try {
-    const [result] = await pool.query(sql, [characters_attempted, characters_missed, wpm, username]);
-    return { id: result.insertId, username, wpm };
+    // const user_id = await getUserIdByEmail(email);
+
+    const [result] = await pool.query(insertAttemptSQL, [user_id, characters_attempted, characters_missed, wpm]);
+
+    const [attemptDetails] = await pool.query(
+      `
+        SELECT attempt_number
+        FROM user_attempts
+        WHERE user_id = ?
+        ORDER BY user_id;
+      `, [user_id]
+    )
+    return {
+      id: result.insertId,
+      characters_attempted,
+      characters_missed,
+      wpm
+    };
   } catch (err) {
+    console.error('Error in insertAttempt:', err);
     throw err;
   }
 }
-
 // Function to delete a user's account from the DB. Will cascade.
 async function deleteUser(username) {
   const sql = `
@@ -146,20 +233,20 @@ async function deleteUser(username) {
   `;
 
   try {
-    console.log('Attempting to delete user:', username);
+    console.log("Attempting to delete user:", username);
     const [rows] = await pool.query(sql, [username]);
-    console.log('User deletion result:', rows);
+    console.log("User deletion result:", rows);
 
     if (rows.affectedRows === 0) {
-      console.log('No user found with username:', username);
-      return { success: false, message: 'User not found' };
+      console.log("No user found with username:", username);
+      return { success: false, message: "User not found" };
     }
 
-    console.log('User deleted successfully');
-    return { success: true, message: 'User deleted successfully' };
+    console.log("User deleted successfully");
+    return { success: true, message: "User deleted successfully" };
   } catch (err) {
-    console.error('Error in deleteUser:', err);
-    console.error('Error stack:', err.stack);
+    console.error("Error in deleteUser:", err);
+    console.error("Error stack:", err.stack);
     throw err;
   }
 }
@@ -173,4 +260,6 @@ module.exports = {
   insertUser,
   insertAttempt,
   deleteUser,
+  getEmailByUsername,
+  getUserIdByEmail,
 };
