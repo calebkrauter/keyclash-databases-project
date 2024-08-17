@@ -15,6 +15,21 @@ app.listen(port, () => {
   console.log(`Server is running on port [${port}]`);
 });
 
+// app.post('/api/achievement', async (req, res) => {
+//   console.log("It's alive!");
+//   res.status(200).json({ message: 'Achievement successful' });
+// });
+
+app.get('/api/leaderboard', async (req, res) => {
+  try {
+    const result = await getLeaderboard();
+    res.status(200).json(result.data);
+  } catch (error) {
+    console.error('Leaderboard error:', error);
+    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+  }
+});
+
 module.exports = {
   express,
   app,
