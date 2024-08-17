@@ -6,7 +6,7 @@
       <div class="game-area">
         <p v-if="gameStarted && !gameEnded" class="text-to-type"><span style="color: purple;">{{
           currentText[curWordIndex]
-        }}</span> <span>{{
+            }}</span> <span>{{
               currentText[curWordIndex + 1] }}</span></p>
         <input v-model="userInput" v-show="gameStarted" @input="checkInput" @keydown="handleKeydown" ref="inputField"
           :disabled="!gameStarted || gameEnded" placeholder="Type here..."
@@ -32,12 +32,15 @@ import { ref, watch, nextTick, computed, onMounted } from 'vue';
 // Reference: Claude AI and ChatGPT4o/3 were used to help with word generation and simple code to house it.
 // TODO ask AI if the word types are correct.
 import { storeToRefs } from 'pinia';
-import { useDataStore } from '@/store';
+import { useDataStore, useAuthStore } from '@/store';
 import Leaderboard from '../components/Leaderboard.vue';
-
 const userStore = useDataStore();
+
 const { countClicks, countKeyPresses } = storeToRefs(userStore);
 const { incrementClicks, incrementKeyPresses } = userStore;
+
+const authStore = useAuthStore();
+const { isLoggedIn, login, username } = storeToRefs(authStore)
 
 window.onclick = () => {
   incrementClicks();
@@ -78,7 +81,7 @@ const sentence = [
 ]
 const space = " ";
 const period = ".";
-const texts = [];
+let texts = [];
 const roundsToPlay = 3;
 const curRound = ref(0);
 
@@ -127,16 +130,21 @@ const slowPoke = ref(false);
 const easterEgg = ref(false);
 const perfectRun = ref(false);
 const perfectionist = ref(false);
-const username = ref('');
+const usernameLocal = ref('');
 const completeUserInputText = ref('');
 const completeText = ref('');
 const inputField = ref(null);
+const attemptedCharacters = ref(0);
+const numOfWrongChars = ref(0);
 let curWordIndex = 0;
 let curCharTextColor = "black";
 let pasteDoneOnce = false;
-let attemptedCharacters = 0;
 let wordsTypedArray = [];
 let wordsGivenArray = [];
+const keysPressedIterator = ref(0);
+let backspacePressed = false;
+let shiftPressed = false
+
 
 const wpm = computed(() => {
   if (!gameEnded.value && !roundsEnded) return 0;
@@ -146,13 +154,15 @@ const wpm = computed(() => {
   return Math.round(wordsTyped / timeInMinutes);
 });
 
+
+
 function startRound() {
   if (curRound.value === 0) {
     startTime.value = Date.now();
   }
   texts.push(generateSentence());
 
-  attemptedCharacters += texts[curRound.value].length;
+  attemptedCharacters.value += texts[curRound.value].length;
 
   roundsEnded.value = false;
   currentText.value = texts[curRound.value].split(' ');
@@ -162,10 +172,7 @@ function startRound() {
   gameStarted.value = true;
   gameEnded.value = false;
 }
-const keysPressedIterator = ref(0);
-let backspacePressed = false;
-let shiftPressed = false
-let numOfWrongChars = 0;
+
 
 watch(gameStarted, () => {
   nextTick(() => {
@@ -294,15 +301,16 @@ function checkInput() {
         let longestCurWordLength = curGivenWordLength >= curTypedWordLength ? curGivenWordLength : curTypedWordLength;
         for (let m = 0; m < longestCurWordLength; m++) {
           if (wordsGivenArray[n].split('')[m] !== wordsTypedArray[n].split('')[m]) {
-            numOfWrongChars++;
+            numOfWrongChars.value++;
           }
 
         }
       }
-      console.log("Number of incorrect characters typed = " + numOfWrongChars);
-
+      console.log("Number of incorrect characters typed = " + numOfWrongChars.value);
       endTime.value = Date.now();
+      saveAttempt();
       gameEnded.value = true;
+      texts = [];
       curWordIndex = 0;
       curRound.value = 0;
       keysPressedIterator.value = -1;
@@ -310,7 +318,7 @@ function checkInput() {
       pasteDoneOnce = false;
       gameStarted.value = false;
       roundsEnded.value = true;
-
+      // fetchLeaderboard();
     } else {
       curWordIndex = 0;
       keysPressedIterator.value = -1;
@@ -342,6 +350,44 @@ function sentenceFeedback() {
 
   }
 }
+const curWPM = ref(wpm);
+async function saveAttempt() {
+  console.log(authStore.username)
+  console.log("saving user attempt")
+  if (!authStore.isLoggedIn) {
+    console.log('User not logged in. Attempt not saved.');
+    return;
+  }
+  try {
+    const response = await fetch(`${API_URL}/api/attempt`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        characters_attempted: attemptedCharacters.value,
+        characters_missed: numOfWrongChars.value,
+        wpm: curWPM.value,
+        username: authStore.username
+      })
+    });
+    console.log(({
+      characters_attempted: attemptedCharacters.value,
+      characters_missed: numOfWrongChars.value,
+      wpm: curWPM.value,
+      username: authStore.username
+    }))
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('Attempt saved:', result);
+  } catch (err) {
+    console.error('Failed to save attempt:', err);
+  }
+}
 if (gameStarted.value) {
   gameStarted.value = false;
 }
@@ -357,7 +403,7 @@ const handleAchievements = async () => {
     easter_egg: easterEgg.value,
     perfect_run: perfectRun.value,
     perfectionist: perfectionist.value,
-    username: username.value,
+    usernameLocal: usernameLocal.value,
   }
   try {
     const response = await fetch(`${API_URL}/api/achievement`, {

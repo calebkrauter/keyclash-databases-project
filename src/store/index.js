@@ -44,39 +44,55 @@ export const useDataStore = defineStore('userData', () => {
   }
 })
 
+
 export const useAuthStore = defineStore('auth', () => {
-
-
   // State
-  // const token = ref()
-  const isLoggedIn = ref(false)
-  const user = ref(null)
+  const token = ref(localStorage.getItem('token') || null)
+  const isLoggedIn = ref(!!token.value)
+  const user = ref( null)
+  const API_URL = 'http://localhost:5001';
 
-  // Getters
-  const username = computed(() => user.value?.name ?? 'Guest')
+  // Getters  
+  const username = computed(() => user.value?.username || localStorage.getItem('user') || null)
 
   // Actions
-  function login(credentials) {
-    return new Promise((resolve) => {
+  async function login(credentials) {
+    try {
+      const response = await fetch(`${API_URL}/api/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials)
+      });
 
-      setTimeout(() => {
-        isLoggedIn.value = true
-        user.value = { name: credentials.email } // Set user data
-        // verifyLogin();
-        resolve()
-      }, 1000) // Simulating API delay
-    })
+      if (!response.ok) {
+        throw new Error('Login failed');
+      }
+
+      const data = await response.json();
+      // console.log(json.loads(token.split('.')[1].base64.urlsafe_b64decode(token.split('.')[1])));
+      token.value = data.token;
+      isLoggedIn.value = true;
+      user.value = data.user;
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', data.user.username);
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   }
 
-
-
-
   function logout() {
-    setTimeout(() => {
-      isLoggedIn.value = false
-      user.value = null
-    }, 1000);
+    token.value = null;
+    isLoggedIn.value = false;
+    user.value = null;
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  }
 
+  function getAuthHeader() {
+    return token.value ? { 'Authorization': `Bearer ${token.value}` } : {}
   }
 
   return {
@@ -84,6 +100,7 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     username,
     login,
-    logout
+    logout,
+    getAuthHeader
   }
 })
